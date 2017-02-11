@@ -34,3 +34,5 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+Haunted/Library/CurrentLayout.dwlt
+Haunted/Library/shadercompiler-UnityShaderCompiler.exe0.log
