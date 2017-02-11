@@ -7,8 +7,8 @@ public class ObjectController : MonoBehaviour {
     public bool walkable = false;
 	// Use this for initialization
 	void Start () {
-		
-	}
+        this.GetComponent<Renderer>().sortingLayerID = SortingLayer.NameToID("Objects");
+    }
 	
 	// Update is called once per frame
 	void Update () {

@@ -35,6 +35,9 @@ public class PlacementManager : MonoBehaviour {
         }
         else if (currentState == State.Edit)
         {
+            Color c = currentObject.GetComponent<Renderer>().material.color;
+            c.a = 0.5f;
+            currentObject.GetComponent<Renderer>().material.color = c;
             Plane plane = new Plane(Vector3.up, 0);
             float dist;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -47,6 +50,8 @@ public class PlacementManager : MonoBehaviour {
             }
             if (Input.GetMouseButtonUp(0))
             {
+                c.a = 1f;
+                currentObject.GetComponent<Renderer>().material.color = c;
                 currentObject = null;
                 currentState = State.Select;
             }

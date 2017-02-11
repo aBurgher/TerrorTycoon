@@ -37,15 +37,53 @@ public class Grid : MonoBehaviour {
             foreach (Transform child in transform)
             {
                 float x, y;
+                
+                
                 x = child.GetComponent<ObjectController>().length;
                 y = child.GetComponent<ObjectController>().width;
-                for (int i = (int)(Mathf.Floor(4*child.position.x)); i < (int)(Mathf.Floor(4 * child.position.x)) + (int)x; i++)
+
+                if (child.transform.rotation.eulerAngles.y == 270)
                 {
-                    for (int j = (int)(Mathf.Floor(4 * child.position.z)); j < (int)(Mathf.Floor(4 * child.position.z)) + (int)y; j++)
+                    for (int i = (int)(Mathf.Floor(4 * child.position.x)); i < (int)(Mathf.Floor(4 * child.position.x)) + (int)y; i++)
                     {
-                        grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
+                        for (int j = (int)(Mathf.Floor(4 * child.position.z)); j < (int)(Mathf.Floor(4 * child.position.z)) + (int)x; j++)
+                        {
+                            grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
+                        }
                     }
                 }
+                else if (child.transform.rotation.eulerAngles.y == 0)
+                {
+                    for (int i = (int)(Mathf.Floor(4 * child.position.x)); i > (int)(Mathf.Floor(4 * child.position.x)) - (int)x; i--)
+                    {
+                        for (int j = (int)(Mathf.Floor(4 * child.position.z))-1; j > (int)(Mathf.Floor(4 * child.position.z)) - (int)y-1; j--)
+                        {
+                            grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
+                        }
+                    }
+                }
+                if (child.transform.rotation.eulerAngles.y == 90)
+                {
+                    for (int i = (int)(Mathf.Floor(4 * child.position.x))-1; i > (int)(Mathf.Floor(4 * child.position.x))-1 - (int)y; i--)
+                    {
+                        for (int j = (int)(Mathf.Floor(4 * child.position.z))-1; j > (int)(Mathf.Floor(4 * child.position.z))-1 - (int)x; j--)
+                        {
+                            grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
+                        }
+                    }
+                }
+                if (child.transform.rotation.eulerAngles.y == 180)
+                {
+                    for (int i = (int)(Mathf.Floor(4 * child.position.x))-1; i < (int)(Mathf.Floor(4 * child.position.x)) + (int)x-1; i++)
+                    {
+                        for (int j = (int)(Mathf.Floor(4 * child.position.z)); j < (int)(Mathf.Floor(4 * child.position.z)) + (int)y; j++)
+                        {
+                            grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
+                        }
+                    }
+                }
+
+
             }
         }
     }
