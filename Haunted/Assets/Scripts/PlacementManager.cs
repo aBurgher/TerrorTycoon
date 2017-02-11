@@ -31,7 +31,30 @@ public class PlacementManager : MonoBehaviour {
         }
         else if (currentState == State.Place)
         {
-
+            Color c = currentObject.GetComponent<Renderer>().material.color;
+            c.a = 0.5f;
+            currentObject.GetComponent<Renderer>().material.color = c;
+            Plane plane = new Plane(Vector3.up, 0);
+            float dist;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (plane.Raycast(ray, out dist))
+            {
+                Vector3 vec = ray.GetPoint(dist);
+                vec = new Vector3(Mathf.Round(vec.x * 4) / 4, 0, Mathf.Round(vec.z * 4) / 4);
+                //vec = new Vector3(Mathf.Round(vec.x)+0.5f, 0, Mathf.Round(vec.z)+0.5f);
+                currentObject.transform.position = vec;
+            }
+            if (Input.GetMouseButtonDown(0))
+            {
+                c.a = 1f;
+                currentObject.GetComponent<Renderer>().material.color = c;
+                currentObject = null;
+                currentState = State.Select;
+            }
+            else if (Input.GetMouseButtonUp(1))
+            {
+                currentObject.transform.Rotate(new Vector3(0, 90, 0));
+            }
         }
         else if (currentState == State.Edit)
         {
@@ -48,7 +71,7 @@ public class PlacementManager : MonoBehaviour {
                 //vec = new Vector3(Mathf.Round(vec.x)+0.5f, 0, Mathf.Round(vec.z)+0.5f);
                 currentObject.transform.position = vec;
             }
-            if (Input.GetMouseButtonUp(0))
+            if (Input.GetMouseButtonDown(0))
             {
                 c.a = 1f;
                 currentObject.GetComponent<Renderer>().material.color = c;
@@ -61,6 +84,6 @@ public class PlacementManager : MonoBehaviour {
             }
 
         }
-
+        
     }
 }

@@ -20,11 +20,7 @@ public class TileManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        Texture2D t = BuildTexture();
-        Sprite s = Sprite.Create(t, new Rect(0, 0, t.width, t.height), Vector2.zero, 8, 0, SpriteMeshType.Tight, Vector4.zero);
-        
-        this.GetComponent<SpriteRenderer>().sprite = s;
-        this.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0.5f);
+       
        
     }
     
