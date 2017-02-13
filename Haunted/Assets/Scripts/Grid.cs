@@ -5,6 +5,8 @@ using UnityEngine;
 public class Grid : MonoBehaviour {
     public bool update;
     float gridScale = 4;
+    Texture2D currentTex, baseTex;
+
     public struct gTile
     {
         public bool canPlace;
@@ -27,6 +29,13 @@ public class Grid : MonoBehaviour {
                 grid[i, j] = new gTile(true, false);
             }
         }
+        baseTex = new Texture2D(200, 160, TextureFormat.ARGB32, false);
+        currentTex = new Texture2D(200, 160, TextureFormat.ARGB32, false);
+        Color[] Colors = baseTex.GetPixels();
+        for (int i = 0; i < Colors.Length; i++)
+            Colors[i] = Color.green;
+        baseTex.SetPixels(Colors);
+        baseTex.Apply();
         update = true;
     }
 
@@ -36,11 +45,12 @@ public class Grid : MonoBehaviour {
         {
             clearGrid();
             updateGrid();
+            Sprite s = Sprite.Create(currentTex, new Rect(0, 0, currentTex.width, currentTex.height), Vector2.zero, 8, 0, SpriteMeshType.Tight, Vector4.zero);
+            GameObject.Find("Tiles").GetComponent<SpriteRenderer>().sprite = s;
+            GameObject.Find("Tiles").GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0.5f);
         }
-        Texture2D t = BuildTexture();
-        Sprite s = Sprite.Create(t, new Rect(0, 0, t.width, t.height), Vector2.zero, 8, 0, SpriteMeshType.Tight, Vector4.zero);
-        GameObject.Find("Tiles").GetComponent<SpriteRenderer>().sprite = s;
-        GameObject.Find("Tiles").GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0.5f);
+        //Texture2D t = BuildTexture();
+        
     }
 
     public Vector2 getDimensions()
@@ -57,13 +67,15 @@ public class Grid : MonoBehaviour {
 
     void updateGrid()
     {
+        currentTex.SetPixels(baseTex.GetPixels());
+        currentTex.Apply();
         foreach (Transform child in transform)
         {
             float x, y;
             Vector2 pos = convertCoordinates(child.transform.position);
             x = child.GetComponent<ObjectController>().length;
             y = child.GetComponent<ObjectController>().width;
-            
+           
             if (child.transform.rotation.eulerAngles.y == 0)
             {
                 if (pos.x > 99 - (y-1) || pos.x < 0 || pos.y > 79 -(x - 1) || pos.y < 0)
@@ -73,6 +85,10 @@ public class Grid : MonoBehaviour {
                     for (int j = (int)pos.y; j < (int)pos.y + (int)x; j++)
                     {
                         grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
+                        currentTex.SetPixel(2*i, 2*j, Color.red);
+                        currentTex.SetPixel(2*i + 1, 2*j, Color.red);
+                        currentTex.SetPixel(2*i, 2*j + 1, Color.red);
+                        currentTex.SetPixel(2*i + 1, 2*j + 1, Color.red);
                     }
                 }
             }
@@ -85,16 +101,27 @@ public class Grid : MonoBehaviour {
                     for (int j = (int)pos.y - 1; j > (int)pos.y - (int)y - 1; j--)
                     {
                         grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
+                        currentTex.SetPixel(2 * i, 2 * j, Color.red);
+                        currentTex.SetPixel(2 * i + 1, 2 * j, Color.red);
+                        currentTex.SetPixel(2 * i, 2 * j + 1, Color.red);
+                        currentTex.SetPixel(2 * i + 1, 2 * j + 1, Color.red);
+
                     }
                 }
             }
             else if (child.transform.rotation.eulerAngles.y == 180)
             {
+                if (pos.x > 100  || pos.x < 0+y|| pos.y > 80 || pos.y < 0 +x)
+                    continue;
                 for (int i = (int)pos.x - 1; i > (int)pos.x - 1 - (int)y; i--)
                 {
                     for (int j = (int)pos.y - 1; j > (int)pos.y - 1 - (int)x; j--)
                     {
                         grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
+                        currentTex.SetPixel(2 * i, 2 * j, Color.red);
+                        currentTex.SetPixel(2 * i + 1, 2 * j, Color.red);
+                        currentTex.SetPixel(2 * i, 2 * j + 1, Color.red);
+                        currentTex.SetPixel(2 * i + 1, 2 * j + 1, Color.red);
                     }
                 }
             }
@@ -105,10 +132,14 @@ public class Grid : MonoBehaviour {
                     for (int j = (int)pos.y; j < (int)pos.y + (int)y; j++)
                     {
                         grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
+                        currentTex.SetPixel(2 * i, 2 * j, Color.red);
+                        currentTex.SetPixel(2 * i + 1, 2 * j, Color.red);
+                        currentTex.SetPixel(2 * i, 2 * j + 1, Color.red);
+                        currentTex.SetPixel(2 * i + 1, 2 * j + 1, Color.red);
                     }
                 }
             }
-
+            currentTex.Apply();
 
         }
 
