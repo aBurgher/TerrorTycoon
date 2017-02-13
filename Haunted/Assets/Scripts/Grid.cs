@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Grid : MonoBehaviour {
     public bool update;
+    float gridScale = 4;
     public struct gTile
     {
         public bool canPlace;
@@ -34,69 +35,86 @@ public class Grid : MonoBehaviour {
         if (update)
         {
             clearGrid();
-            foreach (Transform child in transform)
-            {
-                float x, y;
-                
-                
-                x = child.GetComponent<ObjectController>().length;
-                y = child.GetComponent<ObjectController>().width;
-
-                if (child.transform.rotation.eulerAngles.y == 270)
-                {
-                    if (child.position.x > 25 - (0.25 * (y-1)) || child.position.x < 0 || child.position.z > 20 - (0.25*(x - 1)) || child.position.z < 0)
-                        continue;
-                    for (int i = (int)(Mathf.Floor(4 * child.position.x)); i < (int)(Mathf.Floor(4 * child.position.x)) + (int)y; i++)
-                    {
-                        for (int j = (int)(Mathf.Floor(4 * child.position.z)); j < (int)(Mathf.Floor(4 * child.position.z)) + (int)x; j++)
-                        {
-                            grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
-                        }
-                    }
-                }
-                else if (child.transform.rotation.eulerAngles.y == 0)
-                {
-                    for (int i = (int)(Mathf.Floor(4 * child.position.x)); i > (int)(Mathf.Floor(4 * child.position.x)) - (int)x; i--)
-                    {
-                        for (int j = (int)(Mathf.Floor(4 * child.position.z))-1; j > (int)(Mathf.Floor(4 * child.position.z)) - (int)y-1; j--)
-                        {
-                            grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
-                        }
-                    }
-                }
-                else if (child.transform.rotation.eulerAngles.y == 90)
-                {
-                    for (int i = (int)(Mathf.Floor(4 * child.position.x))-1; i > (int)(Mathf.Floor(4 * child.position.x))-1 - (int)y; i--)
-                    {
-                        for (int j = (int)(Mathf.Floor(4 * child.position.z))-1; j > (int)(Mathf.Floor(4 * child.position.z))-1 - (int)x; j--)
-                        {
-                            grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
-                        }
-                    }
-                }
-                else if (child.transform.rotation.eulerAngles.y == 180)
-                {
-                    for (int i = (int)(Mathf.Floor(4 * child.position.x))-1; i < (int)(Mathf.Floor(4 * child.position.x)) + (int)x-1; i++)
-                    {
-                        for (int j = (int)(Mathf.Floor(4 * child.position.z)); j < (int)(Mathf.Floor(4 * child.position.z)) + (int)y; j++)
-                        {
-                            grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
-                        }
-                    }
-                }
-
-
-            }
+            updateGrid();
         }
         Texture2D t = BuildTexture();
         Sprite s = Sprite.Create(t, new Rect(0, 0, t.width, t.height), Vector2.zero, 8, 0, SpriteMeshType.Tight, Vector4.zero);
         GameObject.Find("Tiles").GetComponent<SpriteRenderer>().sprite = s;
         GameObject.Find("Tiles").GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0.5f);
     }
+
     public Vector2 getDimensions()
     {
         return new Vector2(grid.GetLength(0), grid.GetLength(1));
     }
+
+    Vector2 convertCoordinates(Vector3 vec)
+    {
+        Vector2 gridPos;
+        gridPos = new Vector2(Mathf.Round(gridScale*vec.x), Mathf.Round(gridScale * vec.z));
+        return gridPos;
+    }
+
+    void updateGrid()
+    {
+        foreach (Transform child in transform)
+        {
+            float x, y;
+            Vector2 pos = convertCoordinates(child.transform.position);
+            x = child.GetComponent<ObjectController>().length;
+            y = child.GetComponent<ObjectController>().width;
+            
+            if (child.transform.rotation.eulerAngles.y == 0)
+            {
+                if (pos.x > 99 - (y-1) || pos.x < 0 || pos.y > 79 -(x - 1) || pos.y < 0)
+                    continue;
+                for (int i = (int)pos.x; i < (int)pos.x + (int)y; i++)
+                {
+                    for (int j = (int)pos.y; j < (int)pos.y + (int)x; j++)
+                    {
+                        grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
+                    }
+                }
+            }
+            else if (child.transform.rotation.eulerAngles.y == 90)
+            {
+                if (pos.x > 99 - (x - 1) || pos.x < 0 || pos.y > 80 || pos.y < y)
+                    continue;
+                for (int i = (int)pos.x; i > (int)pos.x - (int)x; i--)
+                {
+                    for (int j = (int)pos.y - 1; j > (int)pos.y - (int)y - 1; j--)
+                    {
+                        grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
+                    }
+                }
+            }
+            else if (child.transform.rotation.eulerAngles.y == 180)
+            {
+                for (int i = (int)pos.x - 1; i > (int)pos.x - 1 - (int)y; i--)
+                {
+                    for (int j = (int)pos.y - 1; j > (int)pos.y - 1 - (int)x; j--)
+                    {
+                        grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
+                    }
+                }
+            }
+            else if (child.transform.rotation.eulerAngles.y == 270)
+            {
+                for (int i = (int)pos.x - 1; i < (int)pos.x + (int)x - 1; i++)
+                {
+                    for (int j = (int)pos.y; j < (int)pos.y + (int)y; j++)
+                    {
+                        grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
+                    }
+                }
+            }
+
+
+        }
+
+
+    }
+
     void clearGrid()
     {
         for (int i = 0; i < 100; i++)
@@ -109,10 +127,13 @@ public class Grid : MonoBehaviour {
         
         
     }
+
     Texture2D BuildTexture()
     {
         Texture2D t = new Texture2D(200, 160, TextureFormat.ARGB32, false);
         Vector2 dimensions = getDimensions();
+        Color red = new Color(1.0f, 0.0f, 0.0f, 1f);
+        Color green = new Color(0.0f, 1.0f, 0.0f, 1f);
         for (int i = 0; i < 2 * dimensions.x; i += 2)
         {
             for (int j = 0; j < 2 * dimensions.y; j += 2)
@@ -121,17 +142,17 @@ public class Grid : MonoBehaviour {
                 if (tile.canWalk)
                 {
 
-                    t.SetPixel(i, j, new Color(0.0f, 1.0f, 0.0f, 1f));
-                    t.SetPixel(i + 1, j, new Color(0.0f, 1.0f, 0.0f, 1f));
-                    t.SetPixel(i, j + 1, new Color(0.0f, 1.0f, 0.0f, 1f));
-                    t.SetPixel(i + 1, j + 1, new Color(0.0f, 1.0f, 0.0f, 1f));
+                    t.SetPixel(i, j, green);
+                    t.SetPixel(i + 1, j, green);
+                    t.SetPixel(i, j + 1, green);
+                    t.SetPixel(i + 1, j + 1, green);
                 }
                 else
                 {
-                    t.SetPixel(i, j, new Color(1.0f, 0.0f, 0.0f, 1f));
-                    t.SetPixel(i + 1, j, new Color(1.0f, 0.0f, 0.0f, 1f));
-                    t.SetPixel(i, j + 1, new Color(1.0f, 0.0f, 0.0f, 1f));
-                    t.SetPixel(i + 1, j + 1, new Color(1.0f, 0.0f, 0.0f, 1f));
+                    t.SetPixel(i, j, red);
+                    t.SetPixel(i + 1, j, red);
+                    t.SetPixel(i, j + 1, red);
+                    t.SetPixel(i + 1, j + 1, red);
                 }
             }
         }
