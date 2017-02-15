@@ -127,6 +127,8 @@ public class Grid : MonoBehaviour {
             }
             else if (child.transform.rotation.eulerAngles.y == 270)
             {
+                if (pos.x > 100  || pos.x < (x) || pos.y > 80-y || pos.y < 0)
+                    continue;
                 for (int i = (int)pos.x - 1; i < (int)pos.x + (int)x - 1; i++)
                 {
                     for (int j = (int)pos.y; j < (int)pos.y + (int)y; j++)
