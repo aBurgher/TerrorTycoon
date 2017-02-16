@@ -26,6 +26,7 @@ public class PlacementManager : MonoBehaviour {
                 {
                     currentObject = hit.transform.gameObject;
                     currentState = State.Edit;
+                    currentObject.GetComponent<ObjectController>().placed = false;
                 }
             }
         }
@@ -59,6 +60,7 @@ public class PlacementManager : MonoBehaviour {
         else if (currentState == State.Edit)
         {
             Color c = currentObject.GetComponent<Renderer>().material.color;
+            Color oc = new Color(c.r, c.g, c.b, c.a);
             c.a = 0.5f;
             currentObject.GetComponent<Renderer>().material.color = c;
             Plane plane = new Plane(Vector3.up, 0);
@@ -68,13 +70,31 @@ public class PlacementManager : MonoBehaviour {
             {
                 Vector3 vec = ray.GetPoint(dist);
                 vec = new Vector3(Mathf.Round(vec.x * 4) / 4, 0, Mathf.Round(vec.z * 4) / 4);
-                //vec = new Vector3(Mathf.Round(vec.x)+0.5f, 0, Mathf.Round(vec.z)+0.5f);
                 currentObject.transform.position = vec;
+                int canPlace = GameObject.Find("Grid").GetComponent<Grid>().canPlace(currentObject);
+                if (canPlace != 1)
+                {
+                    c = Color.red;
+                }
+                else
+                    c = Color.green;
+                c.a = 0.5f;
+                currentObject.GetComponent<Renderer>().material.color = c;
+
             }
             if (Input.GetMouseButtonDown(0))
             {
-                c.a = 1f;
-                currentObject.GetComponent<Renderer>().material.color = c;
+                int canPlace = GameObject.Find("Grid").GetComponent<Grid>().canPlace(currentObject);
+                if (canPlace == 0)
+                    return;
+                else if (canPlace == -1)
+                {
+                    Destroy(currentObject);
+                    currentState = State.Place;
+                }
+                
+                currentObject.GetComponent<Renderer>().material.color = oc;
+                currentObject.GetComponent<ObjectController>().placed = true;
                 currentObject = null;
                 currentState = State.Select;
             }
@@ -86,4 +106,5 @@ public class PlacementManager : MonoBehaviour {
         }
         
     }
+
 }

@@ -84,7 +84,8 @@ public class Grid : MonoBehaviour {
                 {
                     for (int j = (int)pos.y; j < (int)pos.y + (int)x; j++)
                     {
-                        grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
+                        if(child.GetComponent<ObjectController>().placed)
+                            grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
                         currentTex.SetPixel(2*i, 2*j, Color.red);
                         currentTex.SetPixel(2*i + 1, 2*j, Color.red);
                         currentTex.SetPixel(2*i, 2*j + 1, Color.red);
@@ -100,7 +101,8 @@ public class Grid : MonoBehaviour {
                 {
                     for (int j = (int)pos.y - 1; j > (int)pos.y - (int)y - 1; j--)
                     {
-                        grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
+                        if (child.GetComponent<ObjectController>().placed)
+                            grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
                         currentTex.SetPixel(2 * i, 2 * j, Color.red);
                         currentTex.SetPixel(2 * i + 1, 2 * j, Color.red);
                         currentTex.SetPixel(2 * i, 2 * j + 1, Color.red);
@@ -117,7 +119,8 @@ public class Grid : MonoBehaviour {
                 {
                     for (int j = (int)pos.y - 1; j > (int)pos.y - 1 - (int)x; j--)
                     {
-                        grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
+                        if (child.GetComponent<ObjectController>().placed)
+                            grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
                         currentTex.SetPixel(2 * i, 2 * j, Color.red);
                         currentTex.SetPixel(2 * i + 1, 2 * j, Color.red);
                         currentTex.SetPixel(2 * i, 2 * j + 1, Color.red);
@@ -133,7 +136,8 @@ public class Grid : MonoBehaviour {
                 {
                     for (int j = (int)pos.y; j < (int)pos.y + (int)y; j++)
                     {
-                        grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
+                        if (child.GetComponent<ObjectController>().placed)
+                            grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
                         currentTex.SetPixel(2 * i, 2 * j, Color.red);
                         currentTex.SetPixel(2 * i + 1, 2 * j, Color.red);
                         currentTex.SetPixel(2 * i, 2 * j + 1, Color.red);
@@ -161,35 +165,72 @@ public class Grid : MonoBehaviour {
         
     }
 
-    Texture2D BuildTexture()
+    public int canPlace(GameObject obj)
     {
-        Texture2D t = new Texture2D(200, 160, TextureFormat.ARGB32, false);
-        Vector2 dimensions = getDimensions();
-        Color red = new Color(1.0f, 0.0f, 0.0f, 1f);
-        Color green = new Color(0.0f, 1.0f, 0.0f, 1f);
-        for (int i = 0; i < 2 * dimensions.x; i += 2)
+        Vector2 pos = convertCoordinates(obj.transform.position);
+        float x = obj.GetComponent<ObjectController>().length;
+        float y = obj.GetComponent<ObjectController>().width;
+        if (obj.transform.rotation.eulerAngles.y == 0)
         {
-            for (int j = 0; j < 2 * dimensions.y; j += 2)
+            if (pos.x > 99 - (y - 1) || pos.x < 0 || pos.y > 79 - (x - 1) || pos.y < 0)
+                return -1;
+            for (int i = (int)pos.x; i < (int)pos.x + (int)y; i++)
             {
-                Grid.gTile tile = grid[i / 2, j / 2];
-                if (tile.canWalk)
+                for (int j = (int)pos.y; j < (int)pos.y + (int)x; j++)
                 {
-
-                    t.SetPixel(i, j, green);
-                    t.SetPixel(i + 1, j, green);
-                    t.SetPixel(i, j + 1, green);
-                    t.SetPixel(i + 1, j + 1, green);
-                }
-                else
-                {
-                    t.SetPixel(i, j, red);
-                    t.SetPixel(i + 1, j, red);
-                    t.SetPixel(i, j + 1, red);
-                    t.SetPixel(i + 1, j + 1, red);
+                    if (grid[i, j].canPlace == false)
+                    {
+                        return 0;
+                    }
                 }
             }
         }
-        t.Apply();
-        return t;
+        else if (obj.transform.rotation.eulerAngles.y == 90)
+        {
+            if (pos.x > 99 - (x - 1) || pos.x < 0 || pos.y > 80 || pos.y < y)
+                return -1;
+            for (int i = (int)pos.x; i > (int)pos.x - (int)x; i--)
+            {
+                for (int j = (int)pos.y - 1; j > (int)pos.y - (int)y - 1; j--)
+                {
+                    if (grid[i, j].canPlace == false)
+                    {
+                        return 0;
+                    }
+                }
+            }
+        }
+        else if (obj.transform.rotation.eulerAngles.y == 180)
+        {
+            if (pos.x > 100 || pos.x < 0 + y || pos.y > 80 || pos.y < 0 + x)
+                return -1;
+            for (int i = (int)pos.x - 1; i > (int)pos.x - 1 - (int)y; i--)
+            {
+                for (int j = (int)pos.y - 1; j > (int)pos.y - 1 - (int)x; j--)
+                {
+                    if (grid[i, j].canPlace == false)
+                    {
+                        return 0;
+                    }
+                }
+            }
+        }
+        else if (obj.transform.rotation.eulerAngles.y == 270)
+        {
+            if (pos.x > 100 || pos.x < (x) || pos.y > 80 - y || pos.y < 0)
+                return -1;
+            for (int i = (int)pos.x - 1; i < (int)pos.x + (int)x - 1; i++)
+            {
+                for (int j = (int)pos.y; j < (int)pos.y + (int)y; j++)
+                {
+                    if (grid[i, j].canPlace == false)
+                    {
+                        return 0;
+                    }
+                }
+            }
+        }
+
+       return 1;
     }
 }
