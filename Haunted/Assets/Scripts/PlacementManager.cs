@@ -6,6 +6,7 @@ public class PlacementManager : MonoBehaviour {
     public enum State {Select, Place, Edit };
     public State currentState;
     public GameObject currentObject;
+    Color c, oc;
 	// Use this for initialization
 	void Start () {
         currentState = State.Select;
@@ -27,6 +28,16 @@ public class PlacementManager : MonoBehaviour {
                     currentObject = hit.transform.gameObject;
                     currentState = State.Edit;
                     currentObject.GetComponent<ObjectController>().placed = false;
+                    c = currentObject.GetComponent<Renderer>().material.color;
+                    oc = c;
+                }
+                
+                
+                foreach(Transform child in GameObject.Find("Grid").transform)
+                {
+                    Color c = child.GetComponent<Renderer>().material.color;
+                    c.a = 0.5f;
+                    child.GetComponent<Renderer>().material.color = c;
                 }
             }
         }
@@ -51,6 +62,7 @@ public class PlacementManager : MonoBehaviour {
                 currentObject.GetComponent<Renderer>().material.color = c;
                 currentObject = null;
                 currentState = State.Select;
+
             }
             else if (Input.GetMouseButtonUp(1))
             {
@@ -59,8 +71,8 @@ public class PlacementManager : MonoBehaviour {
         }
         else if (currentState == State.Edit)
         {
-            Color c = currentObject.GetComponent<Renderer>().material.color;
-            Color oc = new Color(c.r, c.g, c.b, c.a);
+            
+            
             c.a = 0.5f;
             currentObject.GetComponent<Renderer>().material.color = c;
             Plane plane = new Plane(Vector3.up, 0);
@@ -97,6 +109,12 @@ public class PlacementManager : MonoBehaviour {
                 currentObject.GetComponent<ObjectController>().placed = true;
                 currentObject = null;
                 currentState = State.Select;
+                foreach (Transform child in GameObject.Find("Grid").transform)
+                {
+                    Color b = child.GetComponent<Renderer>().material.color;
+                    b.a = 1.0f;
+                    child.GetComponent<Renderer>().material.color = b;
+                }
             }
             else if (Input.GetMouseButtonUp(1))
             {
