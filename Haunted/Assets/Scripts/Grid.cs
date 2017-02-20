@@ -6,7 +6,8 @@ public class Grid : MonoBehaviour {
     public bool update;
     float gridScale = 4;
     Texture2D currentTex, baseTex;
-
+    PathFinding PathFinder;
+    List<Vector2> Path;
     public struct gTile
     {
         public bool canPlace;
@@ -21,6 +22,7 @@ public class Grid : MonoBehaviour {
     public gTile[,] grid;
     // Use this for initialization
     void Start() {
+        PathFinder = this.GetComponent<PathFinding>();
         grid = new gTile[100, 80];
         for (int i = 0; i < 100; i++)
         {
@@ -46,6 +48,8 @@ public class Grid : MonoBehaviour {
         {
             clearGrid();
             updateGrid();
+            Path = PathFinder.Path(Vector2.zero, getDimensions(), this);
+            drawPath();
             Sprite s = Sprite.Create(currentTex, new Rect(0, 0, currentTex.width, currentTex.height), Vector2.zero, 8, 0, SpriteMeshType.Tight, Vector4.zero);
             GameObject.Find("Tiles").GetComponent<SpriteRenderer>().sprite = s;
             GameObject.Find("Tiles").GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0.5f);
@@ -236,7 +240,20 @@ public class Grid : MonoBehaviour {
     }
     public void visible(bool visible)
     {
-        GameObject.Find("Tiles").GetComponent<SpriteRenderer>().enabled = visible;
-        update = visible;
+        GameObject.Find("Tiles").GetComponent<SpriteRenderer>().enabled = true;
+        update = true;
+    }
+    void drawPath()
+    {
+        if (Path == null)
+            return;
+        foreach (Vector2 vec in Path)
+        {
+            currentTex.SetPixel(2 * (int)vec.x, 2 * (int)vec.y, Color.blue);
+            currentTex.SetPixel(2 * (int)vec.x+1, 2 * (int)vec.y, Color.blue);
+            currentTex.SetPixel(2 * (int)vec.x, 2 * (int)vec.y+1, Color.blue);
+            currentTex.SetPixel(2 * (int)vec.x+1, 2 * (int)vec.y+1, Color.blue);
+        }
+        currentTex.Apply();
     }
 }
