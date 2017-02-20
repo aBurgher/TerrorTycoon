@@ -97,16 +97,16 @@ public class Grid : MonoBehaviour {
             {
                 if (pos.x > 99 - (x - 1) || pos.x < 0 || pos.y > 80 || pos.y < y)
                     continue;
-                for (int i = (int)pos.x; i > (int)pos.x - (int)x; i--)
+                for (int i = (int)pos.x; i < (int)pos.x + (int)x; i++)
                 {
                     for (int j = (int)pos.y - 1; j > (int)pos.y - (int)y - 1; j--)
                     {
                         if (child.GetComponent<ObjectController>().placed)
                             grid[i, j] = new gTile(false, child.GetComponent<ObjectController>().walkable);
                         currentTex.SetPixel(2 * i, 2 * j, Color.red);
-                        currentTex.SetPixel(2 * i + 1, 2 * j, Color.red);
-                        currentTex.SetPixel(2 * i, 2 * j + 1, Color.red);
-                        currentTex.SetPixel(2 * i + 1, 2 * j + 1, Color.red);
+                        currentTex.SetPixel(2 * i - 1, 2 * j, Color.red);
+                        currentTex.SetPixel(2 * i, 2 * j - 1, Color.red);
+                        currentTex.SetPixel(2 * i - 1, 2 * j - 1, Color.red);
 
                     }
                 }
@@ -132,7 +132,7 @@ public class Grid : MonoBehaviour {
             {
                 if (pos.x > 100  || pos.x < (x) || pos.y > 80-y || pos.y < 0)
                     continue;
-                for (int i = (int)pos.x - 1; i < (int)pos.x + (int)x - 1; i++)
+                for (int i = (int)pos.x - (int)x; i < pos.x; i++)
                 {
                     for (int j = (int)pos.y; j < (int)pos.y + (int)y; j++)
                     {
@@ -189,7 +189,7 @@ public class Grid : MonoBehaviour {
         {
             if (pos.x > 99 - (x - 1) || pos.x < 0 || pos.y > 80 || pos.y < y)
                 return -1;
-            for (int i = (int)pos.x; i > (int)pos.x - (int)x; i--)
+            for (int i = (int)pos.x; i < (int)pos.x + (int)x; i++)
             {
                 for (int j = (int)pos.y - 1; j > (int)pos.y - (int)y - 1; j--)
                 {
@@ -219,7 +219,7 @@ public class Grid : MonoBehaviour {
         {
             if (pos.x > 100 || pos.x < (x) || pos.y > 80 - y || pos.y < 0)
                 return -1;
-            for (int i = (int)pos.x - 1; i < (int)pos.x + (int)x - 1; i++)
+            for (int i = (int)pos.x - (int)x; i < pos.x; i++)
             {
                 for (int j = (int)pos.y; j < (int)pos.y + (int)y; j++)
                 {
