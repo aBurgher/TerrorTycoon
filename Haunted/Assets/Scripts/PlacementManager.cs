@@ -34,6 +34,7 @@ public class PlacementManager : MonoBehaviour
                 c = currentObject.GetComponent<Renderer>().material.color;
                 oc = c;
                 setTransparent();
+                GameObject.Find("Grid").GetComponent<Grid>().visible(true);
             }
             if (Input.GetMouseButtonDown(0))
             {
@@ -48,6 +49,7 @@ public class PlacementManager : MonoBehaviour
                     c = currentObject.GetComponent<Renderer>().material.color;
                     oc = c;
                     setTransparent();
+                    GameObject.Find("Grid").GetComponent<Grid>().visible(true);
                 }
 
 
@@ -93,6 +95,7 @@ public class PlacementManager : MonoBehaviour
                 currentObject.GetComponent<ObjectController>().placed = true;
                 currentObject = null;
                 currentState = State.Select;
+                GameObject.Find("Grid").GetComponent<Grid>().visible(false);
                 foreach (Transform child in GameObject.Find("Grid").transform)
                 {
                     Color b = child.GetComponent<Renderer>().material.color;
@@ -116,6 +119,7 @@ public class PlacementManager : MonoBehaviour
                     }
                     Destroy(currentObject);
                     currentState = State.Select;
+                    GameObject.Find("Grid").GetComponent<Grid>().visible(false);
                     return;
                 }
                 GameObject obj = Instantiate(currentObject, currentObject.transform.position, currentObject.transform.rotation, GameObject.Find("Grid").transform);

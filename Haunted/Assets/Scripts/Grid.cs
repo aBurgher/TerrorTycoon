@@ -37,6 +37,7 @@ public class Grid : MonoBehaviour {
         baseTex.SetPixels(Colors);
         baseTex.Apply();
         update = true;
+        visible(false);
     }
 
     // Update is called once per frame
@@ -232,5 +233,10 @@ public class Grid : MonoBehaviour {
         }
 
        return 1;
+    }
+    public void visible(bool visible)
+    {
+        GameObject.Find("Tiles").GetComponent<SpriteRenderer>().enabled = visible;
+        update = visible;
     }
 }
