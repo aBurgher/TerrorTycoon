@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System.Linq;
 public class PathFinding : MonoBehaviour {
     //Used for storing pathfinding values for squares
     
@@ -9,18 +9,18 @@ public class PathFinding : MonoBehaviour {
     
     Vector2 gridDimensions, endPos;
     Square[,] grid;
-    public List<Vector2> Path(Vector2 StartPos, Vector2 EndPos, Grid GridManager)
+    public List<Vector2> Path(Vector2 StartPos, Vector2 EndPos, Vector2 GridDimensions, bool[,] Grid)
     {
         open = new List<Square>();
         closed = new List<Square>();
         endPos = EndPos;
-        gridDimensions = GridManager.getDimensions();
+        gridDimensions = GridDimensions;
         grid = new Square[(int)gridDimensions.x, (int)gridDimensions.y];
         for (int i = 0; i < gridDimensions.x; i++)
         {
             for (int j = 0; j < gridDimensions.y; j++)
             {
-                grid[i, j] = new Square(new Vector2(i, j), GridManager.grid[i, j].canWalk);
+                grid[i, j] = new Square(new Vector2(i, j), Grid[i, j]);
             }
         }
         Square startSquare = grid[(int)StartPos.x, (int)StartPos.y];
@@ -77,7 +77,6 @@ public class PathFinding : MonoBehaviour {
         }
         open.Remove(current);
         closed.Add(current);
-
         current = getLowestF();
         search(current);
         

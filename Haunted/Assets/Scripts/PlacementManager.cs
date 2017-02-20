@@ -69,6 +69,7 @@ public class PlacementManager : MonoBehaviour
                 Vector3 vec = ray.GetPoint(dist);
                 vec = new Vector3(Mathf.Round(vec.x * 4) / 4, 0, Mathf.Round(vec.z * 4) / 4);
                 currentObject.transform.position = vec;
+                GameObject.Find("Grid").GetComponent<Grid>().update = true;
                 int canPlace = GameObject.Find("Grid").GetComponent<Grid>().canPlace(currentObject);
                 if (canPlace != 1)
                 {
@@ -96,12 +97,15 @@ public class PlacementManager : MonoBehaviour
                 currentObject = null;
                 currentState = State.Select;
                 GameObject.Find("Grid").GetComponent<Grid>().visible(false);
+                GameObject.Find("Grid").GetComponent<Grid>().updatePath = true;
+                GameObject.Find("Grid").GetComponent<Grid>().update = true;
                 foreach (Transform child in GameObject.Find("Grid").transform)
                 {
                     Color b = child.GetComponent<Renderer>().material.color;
                     b.a = 1.0f;
                     child.GetComponent<Renderer>().material.color = b;
                 }
+                
             }
             if (Input.GetMouseButtonDown(0) && currentState == State.Place)
             {
@@ -126,6 +130,8 @@ public class PlacementManager : MonoBehaviour
                 obj.GetComponent<ObjectController>().placed = true;
                 obj.GetComponent<Renderer>().material.color = oc;
                 setTransparent();
+                GameObject.Find("Grid").GetComponent<Grid>().updatePath = true;
+                GameObject.Find("Grid").GetComponent<Grid>().update = true;
             }
             else if (Input.GetMouseButtonUp(1))
             {

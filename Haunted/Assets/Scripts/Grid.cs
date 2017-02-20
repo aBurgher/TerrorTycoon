@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Grid : MonoBehaviour {
-    public bool update;
+    public bool update { get; set; }
+    public bool updatePath { get; set; }
     float gridScale = 4;
     Texture2D currentTex, baseTex;
     PathFinding PathFinder;
@@ -39,6 +40,7 @@ public class Grid : MonoBehaviour {
         baseTex.SetPixels(Colors);
         baseTex.Apply();
         update = true;
+        updatePath = true;
         visible(false);
     }
 
@@ -48,11 +50,17 @@ public class Grid : MonoBehaviour {
         {
             clearGrid();
             updateGrid();
-            Path = PathFinder.Path(Vector2.zero, getDimensions(), this);
+            if (updatePath)
+            {
+                bool[,] convertedGrid = convertGrid();
+                Path = PathFinder.Path(Vector2.zero, getDimensions() / 2, new Vector2(convertedGrid.GetLength(0), convertedGrid.GetLength(1)), convertedGrid);
+                updatePath = false;
+            }
             drawPath();
             Sprite s = Sprite.Create(currentTex, new Rect(0, 0, currentTex.width, currentTex.height), Vector2.zero, 8, 0, SpriteMeshType.Tight, Vector4.zero);
             GameObject.Find("Tiles").GetComponent<SpriteRenderer>().sprite = s;
             GameObject.Find("Tiles").GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0.5f);
+            update = false;
         }
         //Texture2D t = BuildTexture();
         
@@ -240,20 +248,53 @@ public class Grid : MonoBehaviour {
     }
     public void visible(bool visible)
     {
-        GameObject.Find("Tiles").GetComponent<SpriteRenderer>().enabled = true;
-        update = true;
+        GameObject.Find("Tiles").GetComponent<SpriteRenderer>().enabled = visible;
     }
+    
     void drawPath()
     {
         if (Path == null)
             return;
         foreach (Vector2 vec in Path)
         {
-            currentTex.SetPixel(2 * (int)vec.x, 2 * (int)vec.y, Color.blue);
-            currentTex.SetPixel(2 * (int)vec.x+1, 2 * (int)vec.y, Color.blue);
-            currentTex.SetPixel(2 * (int)vec.x, 2 * (int)vec.y+1, Color.blue);
-            currentTex.SetPixel(2 * (int)vec.x+1, 2 * (int)vec.y+1, Color.blue);
+            
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    currentTex.SetPixel(4 * (int)vec.x+i, 4 * (int)vec.y+j, Color.blue);
+                }
+            }
         }
         currentTex.Apply();
+    }
+    bool[,] convertGrid()
+    {
+        bool[,] newGrid = new bool[(int)getDimensions().x/2, (int)getDimensions().y/2];
+        for (int i = 0; i < newGrid.GetLength(0); i++)
+        {
+            for (int j = 0; j < newGrid.GetLength(1); j++)
+            {
+                newGrid[i, j] = true;
+                if (!grid[2*i, 2*j].canWalk)
+                {
+                    newGrid[i, j] = false;
+                }
+                if (!grid[2*i+1, 2*j].canWalk)
+                {
+                    newGrid[i, j] = false;
+                }
+                if (!grid[2*i, 2*j+1].canWalk)
+                {
+                    newGrid[i, j] = false;
+                }
+                if (!grid[2*i+1, 2*j + 1].canWalk)
+                {
+                    newGrid[i, j] = false;
+                }
+
+            }
+        }
+        return newGrid;
     }
 }
