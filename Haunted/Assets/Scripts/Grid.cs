@@ -8,7 +8,7 @@ public class Grid : MonoBehaviour {
     float gridScale = 4;
     Texture2D currentTex, baseTex;
     PathFinding PathFinder;
-    List<Vector2> Path;
+    public List<Vector2> Path;
     public struct gTile
     {
         public bool canPlace;
