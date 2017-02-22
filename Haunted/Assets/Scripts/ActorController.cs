@@ -28,8 +28,6 @@ public class ActorController : MonoBehaviour {
             {
                 transform.position = Vector3.MoveTowards(transform.position, new Vector3(nextPos.x /2, 0f, nextPos.y /2), 4*Time.deltaTime);
                 transform.forward = new Vector3(nextPos.x, 0f, nextPos.y); 
-
-
             }
             else
             {
