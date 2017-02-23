@@ -1,21 +1,23 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 public class PlacementManager : MonoBehaviour
 {
     public enum State { Select, Place, Edit };
     public State currentState;
-    public GameObject currentObject;
+    public GameObject currentObject, grid;
     Color c, oc;
+    UndoManager Undo;
     // Use this for initialization
     void Start()
     {
         currentState = State.Select;
+        grid = GameObject.Find("Grid");
+        Undo = grid.GetComponent<UndoManager>();
     }
     void setTransparent()
     {
-        foreach (Transform child in GameObject.Find("Grid").transform)
+        foreach (Transform child in grid.transform)
         {
             Color c = child.GetComponent<Renderer>().material.color;
             c.a = 0.5f;
@@ -25,6 +27,7 @@ public class PlacementManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
         if (currentState == State.Select)
         {
             if (currentObject != null)
@@ -34,7 +37,7 @@ public class PlacementManager : MonoBehaviour
                 c = currentObject.GetComponent<Renderer>().material.color;
                 oc = c;
                 setTransparent();
-                GameObject.Find("Grid").GetComponent<Grid>().visible(true);
+                grid.GetComponent<Grid>().visible(true);
             }
             if (Input.GetMouseButtonDown(0))
             {
@@ -49,7 +52,7 @@ public class PlacementManager : MonoBehaviour
                     c = currentObject.GetComponent<Renderer>().material.color;
                     oc = c;
                     setTransparent();
-                    GameObject.Find("Grid").GetComponent<Grid>().visible(true);
+                    grid.GetComponent<Grid>().visible(true);
                 }
 
 
@@ -59,31 +62,10 @@ public class PlacementManager : MonoBehaviour
         else
         {
 
-            c.a = 0.5f;
-            currentObject.GetComponent<Renderer>().material.color = c;
-            Plane plane = new Plane(Vector3.up, 0);
-            float dist;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (plane.Raycast(ray, out dist))
-            {
-                Vector3 vec = ray.GetPoint(dist);
-                vec = new Vector3(Mathf.Round(vec.x * 4) / 4, 0, Mathf.Round(vec.z * 4) / 4);
-                currentObject.transform.position = vec;
-                GameObject.Find("Grid").GetComponent<Grid>().update = true;
-                int canPlace = GameObject.Find("Grid").GetComponent<Grid>().canPlace(currentObject);
-                if (canPlace != 1)
-                {
-                    c = Color.red;
-                }
-                else
-                    c = Color.green;
-                c.a = 0.5f;
-                currentObject.GetComponent<Renderer>().material.color = c;
-
-            }
+            snapTo();
             if (Input.GetMouseButtonDown(0) && currentState == State.Edit)
             {
-                int canPlace = GameObject.Find("Grid").GetComponent<Grid>().canPlace(currentObject);
+                int canPlace = grid.GetComponent<Grid>().canPlace(currentObject);
                 if (canPlace == 0)
                     return;
                 else if (canPlace == -1)
@@ -96,26 +78,26 @@ public class PlacementManager : MonoBehaviour
                 currentObject.GetComponent<ObjectController>().placed = true;
                 currentObject = null;
                 currentState = State.Select;
-                GameObject.Find("Grid").GetComponent<Grid>().visible(false);
-                GameObject.Find("Grid").GetComponent<Grid>().updatePath = true;
-                GameObject.Find("Grid").GetComponent<Grid>().update = true;
-                foreach (Transform child in GameObject.Find("Grid").transform)
+                grid.GetComponent<Grid>().visible(false);
+                grid.GetComponent<Grid>().updatePath = true;
+                grid.GetComponent<Grid>().update = true;
+                foreach (Transform child in grid.transform)
                 {
                     Color b = child.GetComponent<Renderer>().material.color;
                     b.a = 1.0f;
                     child.GetComponent<Renderer>().material.color = b;
                 }
-                
+
             }
             if (Input.GetMouseButtonDown(0) && currentState == State.Place)
             {
-                int canPlace = GameObject.Find("Grid").GetComponent<Grid>().canPlace(currentObject);
+                int canPlace = grid.GetComponent<Grid>().canPlace(currentObject);
                 if (canPlace == 0)
                     return;
 
                 if (canPlace == -1)
                 {
-                    foreach (Transform child in GameObject.Find("Grid").transform)
+                    foreach (Transform child in grid.transform)
                     {
                         Color b = child.GetComponent<Renderer>().material.color;
                         b.a = 1.0f;
@@ -123,23 +105,117 @@ public class PlacementManager : MonoBehaviour
                     }
                     Destroy(currentObject);
                     currentState = State.Select;
-                    GameObject.Find("Grid").GetComponent<Grid>().visible(false);
+                    grid.GetComponent<Grid>().visible(false);
                     return;
                 }
-                GameObject obj = Instantiate(currentObject, currentObject.transform.position, currentObject.transform.rotation, GameObject.Find("Grid").transform);
+                GameObject obj = Instantiate(currentObject, currentObject.transform.position, currentObject.transform.rotation, grid.transform);
                 obj.GetComponent<ObjectController>().placed = true;
                 obj.GetComponent<Renderer>().material.color = oc;
                 setTransparent();
-                GameObject.Find("Grid").GetComponent<Grid>().updatePath = true;
-                GameObject.Find("Grid").GetComponent<Grid>().update = true;
+                grid.GetComponent<Grid>().updatePath = true;
+                grid.GetComponent<Grid>().update = true;
+                Undo.addChange(new UndoManager.change(obj, UndoManager.Act.Place));
             }
             else if (Input.GetMouseButtonUp(1))
             {
                 currentObject.transform.Rotate(new Vector3(0, 90, 0));
             }
 
-        }
 
         }
 
     }
+
+    void snapTo()
+    {
+        c.a = 0.5f;
+        currentObject.GetComponent<Renderer>().material.color = c;
+        Plane plane = new Plane(Vector3.up, 0);
+        float dist;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (plane.Raycast(ray, out dist))
+        {
+            Vector3 vec = ray.GetPoint(dist);
+            vec = new Vector3(Mathf.Round(vec.x * 4) / 4, 0, Mathf.Round(vec.z * 4) / 4);
+            currentObject.transform.position = vec;
+            grid.GetComponent<Grid>().update = true;
+            int canPlace = grid.GetComponent<Grid>().canPlace(currentObject);
+            if (canPlace != 1)
+            {
+                c = Color.red;
+            }
+            else
+                c = Color.green;
+            c.a = 0.5f;
+            currentObject.GetComponent<Renderer>().material.color = c;
+            if (currentObject.tag == "Prop")
+            {
+                SnapToWall(vec);
+            }
+
+        }
+
+    }
+
+    void SnapToWall(Vector2 mp)
+    {
+
+        if (Input.GetKey(KeyCode.LeftControl))
+            return;
+        Transform obj = getClosest();
+        if (obj != null)
+        {
+
+            Vector2 fP = new Vector2(obj.position.x, obj.position.z);
+            Vector2 sP = CalcSecondPoint(obj);
+            Vector2 vec = new Vector2(currentObject.transform.position.x, currentObject.transform.position.z);
+            print(fP + ", " + sP+ ", "+ Vector2.Distance(sP, vec));
+       
+            if (Vector2.Distance(fP, vec) < 0.75f)
+            {
+                
+                currentObject.transform.rotation = obj.rotation;
+                currentObject.transform.Rotate(new Vector3(0, 180, 0));
+                float f = obj.transform.rotation.eulerAngles.y;
+                currentObject.transform.position = new Vector3(fP.x+0.25f*Mathf.Sin(f/180*Mathf.PI), 0, fP.y+0.25f*Mathf.Cos(f / 180 * Mathf.PI));
+            }
+            else if (Vector2.Distance(sP, vec) < 0.75f)
+            {
+                currentObject.transform.rotation = obj.rotation;
+                currentObject.transform.position = new Vector3(sP.x, 0, sP.y);
+            }
+
+        }
+
+    }
+    Transform getClosest()
+    {
+        float f = 1000;
+        Transform closestObject = null;
+
+        foreach (GameObject g in GameObject.FindGameObjectsWithTag("Prop"))
+        {
+
+            if (g.transform.GetInstanceID() == currentObject.transform.GetInstanceID())
+                continue;
+
+            float tmp = Vector2.Distance(new Vector2(currentObject.transform.position.x, currentObject.transform.position.z), new Vector2(g.transform.position.x, g.transform.position.z));
+            if (tmp < f)
+            {
+                f = tmp;
+                closestObject = g.transform;
+            }
+
+        }
+
+        return closestObject;
+    }
+    Vector2 CalcSecondPoint(Transform t)
+    {
+        Vector2 d = new Vector2(t.GetComponent<ObjectController>().length, t.GetComponent<ObjectController>().width);
+        float rot = t.rotation.eulerAngles.y;
+        Vector2 v = new Vector2(t.position.x + (Mathf.Cos(-rot / 180 * Mathf.PI) * 0.25f * d.y), t.position.z + (Mathf.Sin(-rot / 180 * Mathf.PI) * d.y * 0.25f));
+        return v ;
+    }
+
+}

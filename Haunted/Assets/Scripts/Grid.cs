@@ -89,7 +89,7 @@ public class Grid : MonoBehaviour {
             x = child.GetComponent<ObjectController>().length;
             y = child.GetComponent<ObjectController>().width;
            
-            if (child.transform.rotation.eulerAngles.y == 0)
+            if ((int)child.transform.rotation.eulerAngles.y == 0)
             {
                 if (pos.x > 99 - (y-1) || pos.x < 0 || pos.y > 79 -(x - 1) || pos.y < 0)
                     continue;
@@ -106,7 +106,7 @@ public class Grid : MonoBehaviour {
                     }
                 }
             }
-            else if (child.transform.rotation.eulerAngles.y == 90)
+            else if ((int)child.transform.rotation.eulerAngles.y == 90)
             {
                 if (pos.x > 99 - (x - 1) || pos.x < 0 || pos.y > 80 || pos.y < y)
                     continue;
@@ -124,7 +124,7 @@ public class Grid : MonoBehaviour {
                     }
                 }
             }
-            else if (child.transform.rotation.eulerAngles.y == 180)
+            else if ((int)child.transform.rotation.eulerAngles.y == 180)
             {
                 if (pos.x > 100  || pos.x < 0+y|| pos.y > 80 || pos.y < 0 +x)
                     continue;
@@ -141,7 +141,7 @@ public class Grid : MonoBehaviour {
                     }
                 }
             }
-            else if (child.transform.rotation.eulerAngles.y == 270)
+            else if ((int)child.transform.rotation.eulerAngles.y == 270)
             {
                 if (pos.x > 100  || pos.x < (x) || pos.y > 80-y || pos.y < 0)
                     continue;
@@ -183,7 +183,7 @@ public class Grid : MonoBehaviour {
         Vector2 pos = convertCoordinates(obj.transform.position);
         float x = obj.GetComponent<ObjectController>().length;
         float y = obj.GetComponent<ObjectController>().width;
-        if (obj.transform.rotation.eulerAngles.y == 0)
+        if ((int)obj.transform.rotation.eulerAngles.y == 0)
         {
             if (pos.x > 99 - (y - 1) || pos.x < 0 || pos.y > 79 - (x - 1) || pos.y < 0)
                 return -1;
@@ -198,7 +198,7 @@ public class Grid : MonoBehaviour {
                 }
             }
         }
-        else if (obj.transform.rotation.eulerAngles.y == 90)
+        else if ((int)obj.transform.rotation.eulerAngles.y == 90)
         {
             if (pos.x > 99 - (x - 1) || pos.x < 0 || pos.y > 80 || pos.y < y)
                 return -1;
@@ -213,7 +213,7 @@ public class Grid : MonoBehaviour {
                 }
             }
         }
-        else if (obj.transform.rotation.eulerAngles.y == 180)
+        else if ((int)obj.transform.rotation.eulerAngles.y == 180)
         {
             if (pos.x > 100 || pos.x < 0 + y || pos.y > 80 || pos.y < 0 + x)
                 return -1;
@@ -228,7 +228,7 @@ public class Grid : MonoBehaviour {
                 }
             }
         }
-        else if (obj.transform.rotation.eulerAngles.y == 270)
+        else if ((int)obj.transform.rotation.eulerAngles.y == 270)
         {
             if (pos.x > 100 || pos.x < (x) || pos.y > 80 - y || pos.y < 0)
                 return -1;
