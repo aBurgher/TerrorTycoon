@@ -5,10 +5,12 @@ using UnityEngine;
 public class Grid : MonoBehaviour {
     public bool update { get; set; }
     public bool updatePath { get; set; }
+    public Vector2 Dimensions;
     float gridScale = 4;
     Texture2D currentTex, baseTex;
     PathFinding PathFinder;
     public List<Vector2> Path;
+
     public struct gTile
     {
         public bool canPlace;
@@ -21,6 +23,7 @@ public class Grid : MonoBehaviour {
         }
     }
     public gTile[,] grid;
+
     // Use this for initialization
     void Start() {
         PathFinder = this.GetComponent<PathFinding>();
@@ -42,6 +45,7 @@ public class Grid : MonoBehaviour {
         update = true;
         updatePath = true;
         visible(false);
+        Dimensions = new Vector2(grid.GetLength(0), grid.GetLength(1));
     }
 
     // Update is called once per frame
@@ -53,7 +57,7 @@ public class Grid : MonoBehaviour {
             if (updatePath)
             {
                 bool[,] convertedGrid = convertGrid();
-                Path = PathFinder.Path(Vector2.zero, getDimensions() / 2, new Vector2(convertedGrid.GetLength(0), convertedGrid.GetLength(1)), convertedGrid);
+                Path = PathFinder.Path(Vector2.zero, Dimensions / 2, new Vector2(convertedGrid.GetLength(0), convertedGrid.GetLength(1)), convertedGrid);
                 updatePath = false;
             }
             drawPath();
@@ -66,11 +70,7 @@ public class Grid : MonoBehaviour {
         
     }
 
-    public Vector2 getDimensions()
-    {
-        return new Vector2(grid.GetLength(0), grid.GetLength(1));
-    }
-
+  
     Vector2 convertCoordinates(Vector3 vec)
     {
         Vector2 gridPos;
@@ -91,7 +91,7 @@ public class Grid : MonoBehaviour {
            
             if ((int)child.transform.rotation.eulerAngles.y == 0)
             {
-                if (pos.x > 99 - (y-1) || pos.x < 0 || pos.y > 79 -(x - 1) || pos.y < 0)
+                if (pos.x > Dimensions.x-1 - (y-1) || pos.x < 0 || pos.y > Dimensions.y-1 -(x - 1) || pos.y < 0)
                     continue;
                 for (int i = (int)pos.x; i < (int)pos.x + (int)y; i++)
                 {
@@ -108,7 +108,7 @@ public class Grid : MonoBehaviour {
             }
             else if ((int)child.transform.rotation.eulerAngles.y == 90)
             {
-                if (pos.x > 99 - (x - 1) || pos.x < 0 || pos.y > 80 || pos.y < y)
+                if (pos.x > Dimensions.x-1 - (x - 1) || pos.x < 0 || pos.y > 80 || pos.y < y)
                     continue;
                 for (int i = (int)pos.x; i < (int)pos.x + (int)x; i++)
                 {
@@ -126,7 +126,7 @@ public class Grid : MonoBehaviour {
             }
             else if ((int)child.transform.rotation.eulerAngles.y == 180)
             {
-                if (pos.x > 100  || pos.x < 0+y|| pos.y > 80 || pos.y < 0 +x)
+                if (pos.x > Dimensions.x  || pos.x < 0+y|| pos.y > Dimensions.y || pos.y < 0 +x)
                     continue;
                 for (int i = (int)pos.x - 1; i > (int)pos.x - 1 - (int)y; i--)
                 {
@@ -143,7 +143,7 @@ public class Grid : MonoBehaviour {
             }
             else if ((int)child.transform.rotation.eulerAngles.y == 270)
             {
-                if (pos.x > 100  || pos.x < (x) || pos.y > 80-y || pos.y < 0)
+                if (pos.x > Dimensions.x  || pos.x < (x) || pos.y > Dimensions.y-y || pos.y < 0)
                     continue;
                 for (int i = (int)pos.x - (int)x; i < pos.x; i++)
                 {
@@ -167,9 +167,9 @@ public class Grid : MonoBehaviour {
 
     void clearGrid()
     {
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < Dimensions.x; i++)
         {
-            for (int j = 0; j < 80; j++)
+            for (int j = 0; j < Dimensions.y; j++)
             {
                 grid[i, j] = new gTile(true, true);
             }
@@ -185,7 +185,7 @@ public class Grid : MonoBehaviour {
         float y = obj.GetComponent<ObjectController>().width;
         if ((int)obj.transform.rotation.eulerAngles.y == 0)
         {
-            if (pos.x > 99 - (y - 1) || pos.x < 0 || pos.y > 79 - (x - 1) || pos.y < 0)
+            if (pos.x > Dimensions.x-1 - (y - 1) || pos.x < 0 || pos.y > Dimensions.y-1 - (x - 1) || pos.y < 0)
                 return -1;
             for (int i = (int)pos.x; i < (int)pos.x + (int)y; i++)
             {
@@ -200,7 +200,7 @@ public class Grid : MonoBehaviour {
         }
         else if ((int)obj.transform.rotation.eulerAngles.y == 90)
         {
-            if (pos.x > 99 - (x - 1) || pos.x < 0 || pos.y > 80 || pos.y < y)
+            if (pos.x > Dimensions.x-1 - (x - 1) || pos.x < 0 || pos.y > Dimensions.y || pos.y < y)
                 return -1;
             for (int i = (int)pos.x; i < (int)pos.x + (int)x; i++)
             {
@@ -215,7 +215,7 @@ public class Grid : MonoBehaviour {
         }
         else if ((int)obj.transform.rotation.eulerAngles.y == 180)
         {
-            if (pos.x > 100 || pos.x < 0 + y || pos.y > 80 || pos.y < 0 + x)
+            if (pos.x > Dimensions.x || pos.x < 0 + y || pos.y > Dimensions.y || pos.y < 0 + x)
                 return -1;
             for (int i = (int)pos.x - 1; i > (int)pos.x - 1 - (int)y; i--)
             {
@@ -230,7 +230,7 @@ public class Grid : MonoBehaviour {
         }
         else if ((int)obj.transform.rotation.eulerAngles.y == 270)
         {
-            if (pos.x > 100 || pos.x < (x) || pos.y > 80 - y || pos.y < 0)
+            if (pos.x > Dimensions.x || pos.x < (x) || pos.y > Dimensions.y - y || pos.y < 0)
                 return -1;
             for (int i = (int)pos.x - (int)x; i < pos.x; i++)
             {
@@ -270,7 +270,7 @@ public class Grid : MonoBehaviour {
     }
     bool[,] convertGrid()
     {
-        bool[,] newGrid = new bool[(int)getDimensions().x/2, (int)getDimensions().y/2];
+        bool[,] newGrid = new bool[(int)Dimensions.x/2, (int)Dimensions.y/2];
         for (int i = 0; i < newGrid.GetLength(0); i++)
         {
             for (int j = 0; j < newGrid.GetLength(1); j++)

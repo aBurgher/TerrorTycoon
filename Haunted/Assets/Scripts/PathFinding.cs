@@ -28,20 +28,23 @@ public class PathFinding : MonoBehaviour {
         open.Add(startSquare);
         search(startSquare);
         List<Vector2> path = new List<Vector2>();
-        Square s = closed[closed.Count-1];
-        while (s != startSquare)
+        if (closed.Contains(grid[(int)endPos.x - 1, (int)endPos.y - 1]))
         {
+            Square s = closed[closed.Count - 1];
+            while (s != startSquare)
+            {
+                path.Add(s.Pos);
+                s = s.Parent;
+            }
             path.Add(s.Pos);
-            s = s.Parent;
+            path.Reverse();
         }
-        path.Add(s.Pos);
-        path.Reverse();
         return path;
     }
 
     public void search(Square current)
     {
-        if (closed.Contains(grid[(int)endPos.x-1, (int)endPos.y-1]))
+        if (closed.Contains(grid[(int)endPos.x-1, (int)endPos.y-1]) || current == null)
             return;
         
         
@@ -68,7 +71,7 @@ public class PathFinding : MonoBehaviour {
                         continue;
                 }
                 grid[i, j].H = Mathf.Abs(grid[i, j].Pos.x - endPos.x) * 10 + Mathf.Abs(grid[i, j].Pos.y - endPos.y)*10;
-               
+                grid[i, j].H =Vector2.Distance(grid[i , j].Pos, endPos)*10;
                 grid[i, j].G = Vector2.Distance(grid[i, j].Pos, current.Pos) *10 + current.G;
                 grid[i, j].F = grid[i, j].G + grid[i, j].H;
                 grid[i, j].Parent = current;
@@ -109,6 +112,7 @@ public class PathFinding : MonoBehaviour {
             canWalk = canwalk;
             Pos = pos;
             open = -1;
+            G = 0;
         }
     }
     

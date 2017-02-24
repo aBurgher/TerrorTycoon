@@ -8,7 +8,7 @@ public class TileManager : MonoBehaviour {
 	void Start () {
        
         wGrid = GameObject.Find("Grid").GetComponent<Grid>();
-        //Vector2 dimensions = wGrid.getDimensions();
+        //Vector2 dimensions = wGrid.Dimensions;
         //for (int i = 0; i < dimensions.x; i++)
         {
           //  for (int j = 0; j < dimensions.y; j++)
@@ -27,7 +27,7 @@ public class TileManager : MonoBehaviour {
     Texture2D BuildTexture()
     {
         Texture2D t = new Texture2D(200, 160, TextureFormat.ARGB32, false);
-        Vector2 dimensions = wGrid.getDimensions();
+        Vector2 dimensions = wGrid.Dimensions;
         for (int i = 0; i < 2*dimensions.x; i+= 2)
         {
             for (int j = 0; j<2*dimensions.y;j+=2)

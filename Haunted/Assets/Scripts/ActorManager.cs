@@ -49,11 +49,15 @@ public class ActorManager : MonoBehaviour
         }
         foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Actor"))
         {
-            Ray ray = new Ray(obj.transform.position, Camera.main.transform.position - obj.transform.position);
+            //get screen coordinates
+            Vector2 ScreenCO = Camera.main.WorldToScreenPoint(obj.transform.position);
+            //cast ray through camera at those coordinates
+            Ray ray = Camera.main.ScreenPointToRay(ScreenCO);
             RaycastHit[] hits;
             hits = Physics.RaycastAll(ray, 100);
             foreach (RaycastHit hit in hits)
             {
+                //if it hits a prop and != null
                 if(hit.transform.tag == "Prop")
                 if (hit.collider != null)
                 {

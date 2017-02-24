@@ -11,17 +11,20 @@ public class UndoManager : MonoBehaviour {
         public GameObject obj;
         public Act action;
         public Vector3 position { get; set; }
+        public Quaternion rotation { get; set; }
        public change(GameObject o, Act act)
         {
             obj = o;
             action = act;
             position = Vector3.zero;
+            rotation = Quaternion.identity;
         }
-        public change(GameObject o, Act act, Vector3 vec)
+        public change(GameObject o, Act act, Vector3 vec, Quaternion rot)
         {
             obj = o;
             action = act;
             position = vec;
+            rotation = rot;
         }
     }
 	// Use this for initialization
@@ -38,6 +41,17 @@ public class UndoManager : MonoBehaviour {
             {
                 Undo.Remove(c);
                 Destroy(c.obj);
+            }
+            if (c.action == Act.Edit)
+            {
+                Undo.Remove(c);
+                c.obj.transform.position = c.position;
+                c.obj.transform.rotation = c.rotation;
+            }
+            if (c.action == Act.Delete)
+            {
+                Instantiate(c.obj, c.position, c.rotation, GameObject.Find("Grid").transform);
+                Undo.Remove(c);
             }
             GameObject.Find("Grid").GetComponent<Grid>().update = true;
             GameObject.Find("Grid").GetComponent<Grid>().updatePath = true;

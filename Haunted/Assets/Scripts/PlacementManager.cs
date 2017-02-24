@@ -8,6 +8,8 @@ public class PlacementManager : MonoBehaviour
     public GameObject currentObject, grid;
     Color c, oc;
     UndoManager Undo;
+    Vector3 oPos;
+    Quaternion oRot;
     // Use this for initialization
     void Start()
     {
@@ -48,6 +50,8 @@ public class PlacementManager : MonoBehaviour
                 {
                     currentObject = hit.transform.gameObject;
                     currentState = State.Edit;
+                    oPos = currentObject.transform.position;
+                    oRot = currentObject.transform.rotation;
                     currentObject.GetComponent<ObjectController>().placed = false;
                     c = currentObject.GetComponent<Renderer>().material.color;
                     oc = c;
@@ -76,6 +80,7 @@ public class PlacementManager : MonoBehaviour
 
                 currentObject.GetComponent<Renderer>().material.color = oc;
                 currentObject.GetComponent<ObjectController>().placed = true;
+                Undo.addChange(new UndoManager.change(currentObject, UndoManager.Act.Edit, oPos, oRot));
                 currentObject = null;
                 currentState = State.Select;
                 grid.GetComponent<Grid>().visible(false);
@@ -87,7 +92,7 @@ public class PlacementManager : MonoBehaviour
                     b.a = 1.0f;
                     child.GetComponent<Renderer>().material.color = b;
                 }
-
+                
             }
             if (Input.GetMouseButtonDown(0) && currentState == State.Place)
             {
@@ -138,6 +143,10 @@ public class PlacementManager : MonoBehaviour
             Vector3 vec = ray.GetPoint(dist);
             vec = new Vector3(Mathf.Round(vec.x * 4) / 4, 0, Mathf.Round(vec.z * 4) / 4);
             currentObject.transform.position = vec;
+            if (currentObject.tag == "Prop")
+            {
+                SnapToWall(vec);
+            }
             grid.GetComponent<Grid>().update = true;
             int canPlace = grid.GetComponent<Grid>().canPlace(currentObject);
             if (canPlace != 1)
@@ -148,10 +157,7 @@ public class PlacementManager : MonoBehaviour
                 c = Color.green;
             c.a = 0.5f;
             currentObject.GetComponent<Renderer>().material.color = c;
-            if (currentObject.tag == "Prop")
-            {
-                SnapToWall(vec);
-            }
+            
 
         }
 
@@ -169,22 +175,56 @@ public class PlacementManager : MonoBehaviour
             Vector2 fP = new Vector2(obj.position.x, obj.position.z);
             Vector2 sP = CalcSecondPoint(obj);
             Vector2 vec = new Vector2(currentObject.transform.position.x, currentObject.transform.position.z);
-            print(fP + ", " + sP+ ", "+ Vector2.Distance(sP, vec));
-       
-            if (Vector2.Distance(fP, vec) < 0.75f)
+
+
+            if (Vector2.Distance(fP, vec) < 1f)
             {
-                
+
                 currentObject.transform.rotation = obj.rotation;
                 currentObject.transform.Rotate(new Vector3(0, 180, 0));
                 float f = obj.transform.rotation.eulerAngles.y;
-                currentObject.transform.position = new Vector3(fP.x+0.25f*Mathf.Sin(f/180*Mathf.PI), 0, fP.y+0.25f*Mathf.Cos(f / 180 * Mathf.PI));
+                currentObject.transform.position = new Vector3(fP.x + 0.25f * Mathf.Sin(f / 180 * Mathf.PI), 0, fP.y + 0.25f * Mathf.Cos(f / 180 * Mathf.PI));
             }
-            else if (Vector2.Distance(sP, vec) < 0.75f)
+            else if (Vector2.Distance(sP, vec) < 1f)
             {
                 currentObject.transform.rotation = obj.rotation;
                 currentObject.transform.position = new Vector3(sP.x, 0, sP.y);
             }
+            //snap to edges of world. 
+            else
+                snapEdge();
 
+        }
+        else
+        {
+            snapEdge();
+        }
+
+    }
+    void snapEdge()
+    {
+        Vector2 vec = new Vector2(currentObject.transform.position.x, currentObject.transform.position.z);
+        Vector2 dimensions = grid.GetComponent<Grid>().Dimensions / 4;
+
+        if (vec.x > dimensions.x - 1f && vec.x < dimensions.x+1)
+        {
+            currentObject.transform.position = new Vector3(dimensions.x, 0, vec.y);
+            currentObject.transform.rotation = Quaternion.Euler(new Vector3(0, 180, 0));
+        }
+        else if (vec.x < 1f && vec.x > -1)
+        {
+            currentObject.transform.position = new Vector3(0, 0, vec.y);
+            currentObject.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
+        }
+        else if (vec.y > dimensions.y - 1f && vec.y < dimensions.y+1)
+        {
+            currentObject.transform.position = new Vector3(vec.x, 0, dimensions.y);
+            currentObject.transform.rotation = Quaternion.Euler(new Vector3(0, 90, 0));
+        }
+        else if (vec.y < 1f && vec.y > -1)
+        {
+            currentObject.transform.position = new Vector3(vec.x, 0, 0);
+            currentObject.transform.rotation = Quaternion.Euler(new Vector3(0, 270, 0));
         }
 
     }
