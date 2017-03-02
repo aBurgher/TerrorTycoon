@@ -53,8 +53,8 @@ public class UndoManager : MonoBehaviour {
                 Instantiate(c.obj, c.position, c.rotation, GameObject.Find("Grid").transform);
                 Undo.Remove(c);
             }
+          
             GameObject.Find("Grid").GetComponent<Grid>().update = true;
-            GameObject.Find("Grid").GetComponent<Grid>().updatePath = true;
         }
 	}
     public void addChange(change c )

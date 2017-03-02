@@ -5,21 +5,25 @@ public class PlacementManager : MonoBehaviour
 {
     public enum State { Select, Place, Edit };
     public State currentState;
-    public GameObject currentObject, grid;
+    public GameObject currentObject, gridObj;
+    Grid grid;
     Color c, oc;
     UndoManager Undo;
     Vector3 oPos;
     Quaternion oRot;
+
     // Use this for initialization
     void Start()
     {
         currentState = State.Select;
-        grid = GameObject.Find("Grid");
-        Undo = grid.GetComponent<UndoManager>();
+        gridObj = GameObject.Find("Grid");
+        grid = gridObj.GetComponent<Grid>();
+        Undo = gridObj.GetComponent<UndoManager>();
+
     }
     void setTransparent()
     {
-        foreach (Transform child in grid.transform)
+        foreach (Transform child in gridObj.transform)
         {
             Color c = child.GetComponent<Renderer>().material.color;
             c.a = 0.5f;
@@ -39,7 +43,7 @@ public class PlacementManager : MonoBehaviour
                 c = currentObject.GetComponent<Renderer>().material.color;
                 oc = c;
                 setTransparent();
-                grid.GetComponent<Grid>().visible(true);
+                grid.visible(true);
             }
             if (Input.GetMouseButtonDown(0))
             {
@@ -56,7 +60,7 @@ public class PlacementManager : MonoBehaviour
                     c = currentObject.GetComponent<Renderer>().material.color;
                     oc = c;
                     setTransparent();
-                    grid.GetComponent<Grid>().visible(true);
+                    grid.visible(true);
                 }
 
 
@@ -69,7 +73,7 @@ public class PlacementManager : MonoBehaviour
             snapTo();
             if (Input.GetMouseButtonDown(0) && currentState == State.Edit)
             {
-                int canPlace = grid.GetComponent<Grid>().canPlace(currentObject);
+                int canPlace = grid.canPlace(currentObject);
                 if (canPlace == 0)
                     return;
                 else if (canPlace == -1)
@@ -83,26 +87,27 @@ public class PlacementManager : MonoBehaviour
                 Undo.addChange(new UndoManager.change(currentObject, UndoManager.Act.Edit, oPos, oRot));
                 currentObject = null;
                 currentState = State.Select;
-                grid.GetComponent<Grid>().visible(false);
-                grid.GetComponent<Grid>().updatePath = true;
-                grid.GetComponent<Grid>().update = true;
-                foreach (Transform child in grid.transform)
+                grid.visible(false);
+
+                grid.update = true;
+      
+                foreach (Transform child in gridObj.transform)
                 {
                     Color b = child.GetComponent<Renderer>().material.color;
                     b.a = 1.0f;
                     child.GetComponent<Renderer>().material.color = b;
                 }
-                
+
             }
             if (Input.GetMouseButtonDown(0) && currentState == State.Place)
             {
-                int canPlace = grid.GetComponent<Grid>().canPlace(currentObject);
+                int canPlace = grid.canPlace(currentObject);
                 if (canPlace == 0)
                     return;
 
                 if (canPlace == -1)
                 {
-                    foreach (Transform child in grid.transform)
+                    foreach (Transform child in gridObj.transform)
                     {
                         Color b = child.GetComponent<Renderer>().material.color;
                         b.a = 1.0f;
@@ -110,15 +115,16 @@ public class PlacementManager : MonoBehaviour
                     }
                     Destroy(currentObject);
                     currentState = State.Select;
-                    grid.GetComponent<Grid>().visible(false);
+                    grid.visible(false);
                     return;
                 }
-                GameObject obj = Instantiate(currentObject, currentObject.transform.position, currentObject.transform.rotation, grid.transform);
+                GameObject obj = Instantiate(currentObject, currentObject.transform.position, currentObject.transform.rotation, gridObj.transform);
                 obj.GetComponent<ObjectController>().placed = true;
                 obj.GetComponent<Renderer>().material.color = oc;
                 setTransparent();
-                grid.GetComponent<Grid>().updatePath = true;
-                grid.GetComponent<Grid>().update = true;
+
+                grid.update = true;
+              
                 Undo.addChange(new UndoManager.change(obj, UndoManager.Act.Place));
             }
             else if (Input.GetMouseButtonUp(1))
@@ -147,8 +153,8 @@ public class PlacementManager : MonoBehaviour
             {
                 SnapToWall(vec);
             }
-            grid.GetComponent<Grid>().update = true;
-            int canPlace = grid.GetComponent<Grid>().canPlace(currentObject);
+            grid.update = true;
+            int canPlace = grid.canPlace(currentObject);
             if (canPlace != 1)
             {
                 c = Color.red;
@@ -157,7 +163,7 @@ public class PlacementManager : MonoBehaviour
                 c = Color.green;
             c.a = 0.5f;
             currentObject.GetComponent<Renderer>().material.color = c;
-            
+
 
         }
 
@@ -204,9 +210,9 @@ public class PlacementManager : MonoBehaviour
     void snapEdge()
     {
         Vector2 vec = new Vector2(currentObject.transform.position.x, currentObject.transform.position.z);
-        Vector2 dimensions = grid.GetComponent<Grid>().Dimensions / 4;
+        Vector2 dimensions = grid.Dimensions / 4;
 
-        if (vec.x > dimensions.x - 1f && vec.x < dimensions.x+1)
+        if (vec.x > dimensions.x - 1f && vec.x < dimensions.x + 1)
         {
             currentObject.transform.position = new Vector3(dimensions.x, 0, vec.y);
             currentObject.transform.rotation = Quaternion.Euler(new Vector3(0, 180, 0));
@@ -216,7 +222,7 @@ public class PlacementManager : MonoBehaviour
             currentObject.transform.position = new Vector3(0, 0, vec.y);
             currentObject.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
         }
-        else if (vec.y > dimensions.y - 1f && vec.y < dimensions.y+1)
+        else if (vec.y > dimensions.y - 1f && vec.y < dimensions.y + 1)
         {
             currentObject.transform.position = new Vector3(vec.x, 0, dimensions.y);
             currentObject.transform.rotation = Quaternion.Euler(new Vector3(0, 90, 0));
@@ -255,7 +261,7 @@ public class PlacementManager : MonoBehaviour
         Vector2 d = new Vector2(t.GetComponent<ObjectController>().length, t.GetComponent<ObjectController>().width);
         float rot = t.rotation.eulerAngles.y;
         Vector2 v = new Vector2(t.position.x + (Mathf.Cos(-rot / 180 * Mathf.PI) * 0.25f * d.y), t.position.z + (Mathf.Sin(-rot / 180 * Mathf.PI) * d.y * 0.25f));
-        return v ;
+        return v;
     }
 
 }
