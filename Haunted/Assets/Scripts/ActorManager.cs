@@ -34,6 +34,8 @@ public class ActorManager : MonoBehaviour
         for (int i = 0; i < Walls.Count; i++)
         {
             Wall w = Walls[i];
+            if (w.obj == null)
+                continue;
             if (w.ishit)
             {
                 w.ishit = false;

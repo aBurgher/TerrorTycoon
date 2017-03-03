@@ -4,14 +4,13 @@ using UnityEngine;
 
 public class Grid : MonoBehaviour
 {
-    public bool update { get; set; }
+    public bool update;
  
     public Vector2 Dimensions;
     float gridScale = 4;
     Texture2D currentTex, baseTex;
 
-    public List<Vector2> Path { get; set; }
-
+    public List<Vector2> Path;
     public struct gTile
     {
         public bool canPlace;

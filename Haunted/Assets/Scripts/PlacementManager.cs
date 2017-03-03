@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using System.Linq;
 public class PlacementManager : MonoBehaviour
 {
     public enum State { Select, Place, Edit };
@@ -90,7 +92,7 @@ public class PlacementManager : MonoBehaviour
                 grid.visible(false);
 
                 grid.update = true;
-      
+
                 foreach (Transform child in gridObj.transform)
                 {
                     Color b = child.GetComponent<Renderer>().material.color;
@@ -124,7 +126,7 @@ public class PlacementManager : MonoBehaviour
                 setTransparent();
 
                 grid.update = true;
-              
+
                 Undo.addChange(new UndoManager.change(obj, UndoManager.Act.Place));
             }
             else if (Input.GetMouseButtonUp(1))
@@ -174,27 +176,34 @@ public class PlacementManager : MonoBehaviour
 
         if (Input.GetKey(KeyCode.LeftControl))
             return;
-        Transform obj = getClosest();
-        if (obj != null)
+        Point point = getClosestPoint();
+        if (point.Object != null)
         {
-
+            Transform obj = point.Object.transform;
             Vector2 fP = new Vector2(obj.position.x, obj.position.z);
-            Vector2 sP = CalcSecondPoint(obj);
+            Vector2 sP = obj.GetComponent<ObjectController>().EndPoint;
             Vector2 vec = new Vector2(currentObject.transform.position.x, currentObject.transform.position.z);
 
-
+            
             if (Vector2.Distance(fP, vec) < 1f)
             {
 
-                currentObject.transform.rotation = obj.rotation;
-                currentObject.transform.Rotate(new Vector3(0, 180, 0));
-                float f = obj.transform.rotation.eulerAngles.y;
-                currentObject.transform.position = new Vector3(fP.x + 0.25f * Mathf.Sin(f / 180 * Mathf.PI), 0, fP.y + 0.25f * Mathf.Cos(f / 180 * Mathf.PI));
+                if (Mathf.RoundToInt((Mathf.Abs(obj.rotation.eulerAngles.y - currentObject.transform.rotation.eulerAngles.y) / 90)) % 2 == 0)
+                {
+                    currentObject.transform.rotation = obj.rotation;
+                    currentObject.transform.Rotate(new Vector3(0, 180, 0));
+                    float f = obj.transform.rotation.eulerAngles.y;
+                    currentObject.transform.position = new Vector3(fP.x + 0.25f * Mathf.Sin(f / 180 * Mathf.PI), 0, fP.y + 0.25f * Mathf.Cos(f / 180 * Mathf.PI));
+                }
+                
             }
             else if (Vector2.Distance(sP, vec) < 1f)
             {
-                currentObject.transform.rotation = obj.rotation;
-                currentObject.transform.position = new Vector3(sP.x, 0, sP.y);
+                if (Mathf.RoundToInt((Mathf.Abs(obj.rotation.eulerAngles.y - currentObject.transform.rotation.eulerAngles.y) / 90)) % 2 == 0)
+                {
+                    currentObject.transform.rotation = obj.rotation;
+                    currentObject.transform.position = new Vector3(sP.x, 0, sP.y);
+                }
             }
             //snap to edges of world. 
             else
@@ -209,6 +218,7 @@ public class PlacementManager : MonoBehaviour
     }
     void snapEdge()
     {
+       
         Vector2 vec = new Vector2(currentObject.transform.position.x, currentObject.transform.position.z);
         Vector2 dimensions = grid.Dimensions / 4;
 
@@ -256,12 +266,41 @@ public class PlacementManager : MonoBehaviour
 
         return closestObject;
     }
-    Vector2 CalcSecondPoint(Transform t)
+    Point getClosestPoint()
     {
-        Vector2 d = new Vector2(t.GetComponent<ObjectController>().length, t.GetComponent<ObjectController>().width);
-        float rot = t.rotation.eulerAngles.y;
-        Vector2 v = new Vector2(t.position.x + (Mathf.Cos(-rot / 180 * Mathf.PI) * 0.25f * d.y), t.position.z + (Mathf.Sin(-rot / 180 * Mathf.PI) * d.y * 0.25f));
-        return v;
+        List<Point> pointList = new List<Point>();
+        float f = float.PositiveInfinity;
+        Point closestPoint = new Point(null, Vector2.zero);
+        Vector2 currentPosition = new Vector2(currentObject.transform.position.x, currentObject.transform.position.z);
+        foreach (GameObject g in GameObject.FindGameObjectsWithTag("Prop"))
+        {
+            if (g.GetComponent<ObjectController>().placed)
+            {
+                pointList.Add(new Point(g, new Vector2(g.transform.position.x, g.transform.position.z)));
+                pointList.Add(new Point(g, g.GetComponent<ObjectController>().EndPoint));
+            }
+        }
+        foreach (Point p in pointList)
+        {
+            if (Vector2.Distance(p.point, currentPosition) < f)
+            {
+                closestPoint = p;
+                f = Vector2.Distance(p.point, currentPosition);
+            }
+        }
+        return closestPoint;
     }
+    //struct used for wall snapping calculation. 
+    struct Point
+    {
+        public Vector2 point;
+        public GameObject Object;
 
+        public Point(GameObject obj, Vector2 p)
+        {
+            Object = obj;
+            point = p;
+        }
+ 
+    }
 }
