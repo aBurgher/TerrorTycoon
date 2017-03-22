@@ -11,6 +11,7 @@ public class Grid : MonoBehaviour
     Texture2D currentTex, baseTex;
 
     public List<Vector2> Path;
+    //Strucutre used for storing world data.
     public struct gTile
     {
         public bool canPlace;
@@ -27,7 +28,7 @@ public class Grid : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-
+        //Initializes the grid
         grid = new gTile[100, 80];
         for (int i = 0; i < 100; i++)
         {
@@ -36,6 +37,7 @@ public class Grid : MonoBehaviour
                 grid[i, j] = new gTile(true, false);
             }
         }
+        //initializes the textures
         baseTex = new Texture2D(200, 160, TextureFormat.ARGB32, false);
         currentTex = new Texture2D(200, 160, TextureFormat.ARGB32, false);
         Color[] Colors = baseTex.GetPixels();
@@ -55,10 +57,11 @@ public class Grid : MonoBehaviour
     {
         if (update)
         {
+            //clears and updates the grid
             clearGrid();
             updateGrid();
          
-
+            //Updates the sprite that displays the grid. 
             Sprite s = Sprite.Create(currentTex, new Rect(0, 0, currentTex.width, currentTex.height), Vector2.zero, 8, 0, SpriteMeshType.Tight, Vector4.zero);
             GameObject.Find("Tiles").GetComponent<SpriteRenderer>().sprite = s;
             GameObject.Find("Tiles").GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0.5f);
@@ -69,25 +72,32 @@ public class Grid : MonoBehaviour
 
     }
 
-
+    //converts world position to position on the grid. 
     Vector2 convertCoordinates(Vector3 vec)
     {
         Vector2 gridPos;
         gridPos = new Vector2(Mathf.Round(gridScale * vec.x), Mathf.Round(gridScale * vec.z));
         return gridPos;
     }
-
+    //function ot update teh grid
     void updateGrid()
     {
+        //resets the grid texture to be green. 
         currentTex.SetPixels(baseTex.GetPixels());
         currentTex.Apply();
+        //Iterates through the grid objects 
         foreach (Transform child in transform)
         {
+            //skips the object if it isn't active
+            if (!child.gameObject.activeSelf)
+                continue;
+            //gets the objects dimensions and grid coordinates
             float x, y;
             Vector2 pos = convertCoordinates(child.transform.position);
             x = child.GetComponent<ObjectController>().length;
             y = child.GetComponent<ObjectController>().width;
 
+            //checks the objects rotation and updates the grid and texture pixels based on it. 
             if ((int)child.transform.rotation.eulerAngles.y == 0)
             {
                 if (pos.x > Dimensions.x - 1 - (y - 1) || pos.x < 0 || pos.y > Dimensions.y - 1 - (x - 1) || pos.y < 0)
@@ -157,13 +167,14 @@ public class Grid : MonoBehaviour
                     }
                 }
             }
+            //applies the texture
             currentTex.Apply();
 
         }
 
 
     }
-
+    //clears the grid back to empty
     void clearGrid()
     {
         for (int i = 0; i < Dimensions.x; i++)
@@ -177,6 +188,7 @@ public class Grid : MonoBehaviour
 
     }
 
+    //checks if an object is placable, returns a 1 for yes, 0 for no, or a -1 for out of bounds. 
     public int canPlace(GameObject obj)
     {
         Vector2 pos = convertCoordinates(obj.transform.position);
@@ -245,39 +257,12 @@ public class Grid : MonoBehaviour
 
         return 1;
     }
+    //sets shows/hides the grid. 
     public void visible(bool visible)
     {
         GameObject.Find("Tiles").GetComponent<SpriteRenderer>().enabled = visible;
     }
 
   
-    public bool[,] convertGrid()
-    {
-        bool[,] newGrid = new bool[(int)Dimensions.x / 2, (int)Dimensions.y / 2];
-        for (int i = 0; i < newGrid.GetLength(0); i++)
-        {
-            for (int j = 0; j < newGrid.GetLength(1); j++)
-            {
-                newGrid[i, j] = true;
-                if (!grid[2 * i, 2 * j].canWalk)
-                {
-                    newGrid[i, j] = false;
-                }
-                if (!grid[2 * i + 1, 2 * j].canWalk)
-                {
-                    newGrid[i, j] = false;
-                }
-                if (!grid[2 * i, 2 * j + 1].canWalk)
-                {
-                    newGrid[i, j] = false;
-                }
-                if (!grid[2 * i + 1, 2 * j + 1].canWalk)
-                {
-                    newGrid[i, j] = false;
-                }
 
-            }
-        }
-        return newGrid;
-    }
 }

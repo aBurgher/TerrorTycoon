@@ -9,7 +9,7 @@ public class PlacementManager : MonoBehaviour
     public State currentState;
     public GameObject currentObject, gridObj;
     Grid grid;
-    Color c, oc;
+    Color currentColor, originalColor;
     UndoManager Undo;
     Vector3 oPos;
     Quaternion oRot;
@@ -23,15 +23,7 @@ public class PlacementManager : MonoBehaviour
         Undo = gridObj.GetComponent<UndoManager>();
 
     }
-    void setTransparent()
-    {
-        foreach (Transform child in gridObj.transform)
-        {
-            Color c = child.GetComponent<Renderer>().material.color;
-            c.a = 0.5f;
-            child.GetComponent<Renderer>().material.color = c;
-        }
-    }
+ 
     // Update is called once per frame
     void Update()
     {
@@ -42,8 +34,8 @@ public class PlacementManager : MonoBehaviour
             {
                 currentState = State.Place;
                 currentObject.GetComponent<ObjectController>().placed = false;
-                c = currentObject.GetComponent<Renderer>().material.color;
-                oc = c;
+                currentColor = currentObject.GetComponent<Renderer>().material.color;
+                originalColor = currentColor;
                 setTransparent();
                 grid.visible(true);
             }
@@ -59,8 +51,8 @@ public class PlacementManager : MonoBehaviour
                     oPos = currentObject.transform.position;
                     oRot = currentObject.transform.rotation;
                     currentObject.GetComponent<ObjectController>().placed = false;
-                    c = currentObject.GetComponent<Renderer>().material.color;
-                    oc = c;
+                    currentColor = currentObject.GetComponent<Renderer>().material.color;
+                    originalColor = currentColor;
                     setTransparent();
                     grid.visible(true);
                 }
@@ -80,25 +72,26 @@ public class PlacementManager : MonoBehaviour
                     return;
                 else if (canPlace == -1)
                 {
-                    Destroy(currentObject);
-                    currentState = State.Place;
+                    Undo.addChange(new UndoManager.change(currentObject, UndoManager.Act.Delete, oPos, oRot));
+                    currentObject.SetActive(false);
+                    currentObject.GetComponent<Renderer>().material.color = originalColor;
+                    currentObject = null;
+                    currentState = State.Select;
+                    grid.visible(false);
+                    grid.update = true;
+                    setOpaque();
+                    return;
                 }
 
-                currentObject.GetComponent<Renderer>().material.color = oc;
+                currentObject.GetComponent<Renderer>().material.color = originalColor;
                 currentObject.GetComponent<ObjectController>().placed = true;
                 Undo.addChange(new UndoManager.change(currentObject, UndoManager.Act.Edit, oPos, oRot));
                 currentObject = null;
                 currentState = State.Select;
+
                 grid.visible(false);
-
                 grid.update = true;
-
-                foreach (Transform child in gridObj.transform)
-                {
-                    Color b = child.GetComponent<Renderer>().material.color;
-                    b.a = 1.0f;
-                    child.GetComponent<Renderer>().material.color = b;
-                }
+                setOpaque();
 
             }
             if (Input.GetMouseButtonDown(0) && currentState == State.Place)
@@ -109,12 +102,7 @@ public class PlacementManager : MonoBehaviour
 
                 if (canPlace == -1)
                 {
-                    foreach (Transform child in gridObj.transform)
-                    {
-                        Color b = child.GetComponent<Renderer>().material.color;
-                        b.a = 1.0f;
-                        child.GetComponent<Renderer>().material.color = b;
-                    }
+                    setOpaque();
                     Destroy(currentObject);
                     currentState = State.Select;
                     grid.visible(false);
@@ -122,7 +110,7 @@ public class PlacementManager : MonoBehaviour
                 }
                 GameObject obj = Instantiate(currentObject, currentObject.transform.position, currentObject.transform.rotation, gridObj.transform);
                 obj.GetComponent<ObjectController>().placed = true;
-                obj.GetComponent<Renderer>().material.color = oc;
+                obj.GetComponent<Renderer>().material.color = originalColor;
                 setTransparent();
 
                 grid.update = true;
@@ -138,11 +126,28 @@ public class PlacementManager : MonoBehaviour
         }
 
     }
-
+    void setTransparent()
+    {
+        foreach (Transform child in gridObj.transform)
+        {
+            Color c = child.GetComponent<Renderer>().material.color;
+            c.a = 0.5f;
+            child.GetComponent<Renderer>().material.color = c;
+        }
+    }
+    void setOpaque()
+    {
+        foreach (Transform child in gridObj.transform)
+        {
+            Color c = child.GetComponent<Renderer>().material.color;
+            c.a = 1f;
+            child.GetComponent<Renderer>().material.color = c;
+        }
+    }
     void snapTo()
     {
-        c.a = 0.5f;
-        currentObject.GetComponent<Renderer>().material.color = c;
+        currentColor.a = 0.5f;
+        currentObject.GetComponent<Renderer>().material.color = currentColor;
         Plane plane = new Plane(Vector3.up, 0);
         float dist;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -159,12 +164,12 @@ public class PlacementManager : MonoBehaviour
             int canPlace = grid.canPlace(currentObject);
             if (canPlace != 1)
             {
-                c = Color.red;
+                currentColor = Color.red;
             }
             else
-                c = Color.green;
-            c.a = 0.5f;
-            currentObject.GetComponent<Renderer>().material.color = c;
+                currentColor = Color.green;
+            currentColor.a = 0.5f;
+            currentObject.GetComponent<Renderer>().material.color = currentColor;
 
 
         }
@@ -244,28 +249,7 @@ public class PlacementManager : MonoBehaviour
         }
 
     }
-    Transform getClosest()
-    {
-        float f = 1000;
-        Transform closestObject = null;
 
-        foreach (GameObject g in GameObject.FindGameObjectsWithTag("Prop"))
-        {
-
-            if (g.transform.GetInstanceID() == currentObject.transform.GetInstanceID())
-                continue;
-
-            float tmp = Vector2.Distance(new Vector2(currentObject.transform.position.x, currentObject.transform.position.z), new Vector2(g.transform.position.x, g.transform.position.z));
-            if (tmp < f)
-            {
-                f = tmp;
-                closestObject = g.transform;
-            }
-
-        }
-
-        return closestObject;
-    }
     Point getClosestPoint()
     {
         List<Point> pointList = new List<Point>();
