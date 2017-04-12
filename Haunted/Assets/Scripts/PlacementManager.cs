@@ -156,7 +156,7 @@ public class PlacementManager : MonoBehaviour
             Vector3 vec = ray.GetPoint(dist);
             vec = new Vector3(Mathf.Round(vec.x * 4) / 4, 0, Mathf.Round(vec.z * 4) / 4);
             currentObject.transform.position = vec;
-            if (currentObject.tag == "Prop")
+            if (currentObject.tag == "Wall")
             {
                 SnapToWall(vec);
             }
@@ -256,7 +256,7 @@ public class PlacementManager : MonoBehaviour
         float f = float.PositiveInfinity;
         Point closestPoint = new Point(null, Vector2.zero);
         Vector2 currentPosition = new Vector2(currentObject.transform.position.x, currentObject.transform.position.z);
-        foreach (GameObject g in GameObject.FindGameObjectsWithTag("Prop"))
+        foreach (GameObject g in GameObject.FindGameObjectsWithTag("Wall"))
         {
             if (g.GetComponent<ObjectController>().placed)
             {

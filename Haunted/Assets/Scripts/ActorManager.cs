@@ -27,7 +27,7 @@ public class ActorManager : MonoBehaviour
     void Update()
     {
         if (obj != null)
-            if (Input.GetKeyDown(KeyCode.LeftShift))
+            if (Input.GetKey(KeyCode.LeftShift))
             {
                 Instantiate(obj);
             }
@@ -60,7 +60,7 @@ public class ActorManager : MonoBehaviour
             foreach (RaycastHit hit in hits)
             {
                 //if it hits a prop and != null
-                if(hit.transform.tag == "Prop")
+                if(hit.transform.tag == "Prop" || hit.transform.tag == "Wall")
                 if (hit.collider != null)
                 {
                     Wall w = new Wall(hit.transform, false);

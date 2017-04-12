@@ -18,9 +18,9 @@ public class ActorController : MonoBehaviour
     void Update()
     {
         agent.SetDestination(new Vector3(25,0, 20));
-        if (transform.position == agent.destination)
+        if (Vector3.Distance(transform.position, agent.destination) < 0.5)
         {
-            Destroy(this);
+            Destroy(this.gameObject);
         }
     }
 }
