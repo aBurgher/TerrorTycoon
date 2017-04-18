@@ -147,7 +147,10 @@ public class PlacementManager : MonoBehaviour
     void snapTo()
     {
         currentColor.a = 0.5f;
-        currentObject.GetComponent<Renderer>().material.color = currentColor;
+        if (currentObject.GetComponent<Renderer>() != null)
+            currentObject.GetComponent<Renderer>().material.color = currentColor;
+        else
+            return;
         Plane plane = new Plane(Vector3.up, 0);
         float dist;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
