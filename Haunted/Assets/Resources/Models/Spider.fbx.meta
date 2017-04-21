@@ -1,0 +1,178 @@
+fileFormatVersion: 2
+guid: f24bf56b62026254e88294dfe82fb14a
+timeCreated: 1492757655
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: Armature
+    100002: BLeg1.L
+    100004: BLeg1.L_end
+    100006: BLeg1.R
+    100008: BLeg1.R_end
+    100010: BLeg2.L
+    100012: BLeg2.L_end
+    100014: BLeg2.R
+    100016: BLeg2.R_end
+    100018: BLeg3.L
+    100020: BLeg3.L_end
+    100022: BLeg3.R
+    100024: BLeg3.R_end
+    100026: BLeg4.L
+    100028: BLeg4.L_end
+    100030: BLeg4.R
+    100032: BLeg4.R_end
+    100034: Cylinder.002
+    100036: head
+    100038: head_end
+    100040: MLeg1.L
+    100042: MLeg1.R
+    100044: MLeg2.L
+    100046: MLeg2.R.001
+    100048: MLeg3.L
+    100050: MLeg3.R
+    100052: MLeg4.L
+    100054: MLeg4.R
+    100056: //RootNode
+    100058: torso1
+    100060: torso1.001
+    100062: torso1.002
+    100064: torso1.002_end
+    100066: torso2
+    100068: torso2.001
+    100070: torso2.001_end
+    100072: torso2.002
+    100074: torso3
+    100076: torso3.001
+    100078: torso3.001_end
+    100080: torso3.002
+    100082: ULeg1.L
+    100084: ULeg1.R
+    100086: ULeg2.L
+    100088: ULeg2.R
+    100090: ULeg3.L
+    100092: ULeg3.R
+    100094: ULeg4.L
+    100096: ULeg4.R
+    400000: Armature
+    400002: BLeg1.L
+    400004: BLeg1.L_end
+    400006: BLeg1.R
+    400008: BLeg1.R_end
+    400010: BLeg2.L
+    400012: BLeg2.L_end
+    400014: BLeg2.R
+    400016: BLeg2.R_end
+    400018: BLeg3.L
+    400020: BLeg3.L_end
+    400022: BLeg3.R
+    400024: BLeg3.R_end
+    400026: BLeg4.L
+    400028: BLeg4.L_end
+    400030: BLeg4.R
+    400032: BLeg4.R_end
+    400034: Cylinder.002
+    400036: head
+    400038: head_end
+    400040: MLeg1.L
+    400042: MLeg1.R
+    400044: MLeg2.L
+    400046: MLeg2.R.001
+    400048: MLeg3.L
+    400050: MLeg3.R
+    400052: MLeg4.L
+    400054: MLeg4.R
+    400056: //RootNode
+    400058: torso1
+    400060: torso1.001
+    400062: torso1.002
+    400064: torso1.002_end
+    400066: torso2
+    400068: torso2.001
+    400070: torso2.001_end
+    400072: torso2.002
+    400074: torso3
+    400076: torso3.001
+    400078: torso3.001_end
+    400080: torso3.002
+    400082: ULeg1.L
+    400084: ULeg1.R
+    400086: ULeg2.L
+    400088: ULeg2.R
+    400090: ULeg3.L
+    400092: ULeg3.R
+    400094: ULeg4.L
+    400096: ULeg4.R
+    4300000: Cylinder.002
+    9500000: //RootNode
+    13700000: Cylinder.002
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

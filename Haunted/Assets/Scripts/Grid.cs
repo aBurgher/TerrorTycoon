@@ -41,8 +41,9 @@ public class Grid : MonoBehaviour
         baseTex = new Texture2D(200, 160, TextureFormat.ARGB32, false);
         currentTex = new Texture2D(200, 160, TextureFormat.ARGB32, false);
         Color[] Colors = baseTex.GetPixels();
+        Color C = new Color(0.161f, .407f, 0f);
         for (int i = 0; i < Colors.Length; i++)
-            Colors[i] = Color.green;
+            Colors[i] = C;
         baseTex.SetPixels(Colors);
         baseTex.Apply();
         update = true;
@@ -53,7 +54,7 @@ public class Grid : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (update)
         {

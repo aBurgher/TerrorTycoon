@@ -43,9 +43,9 @@ public class ActorManager : MonoBehaviour
             }
             else
             {
-                Color c = w.obj.GetComponent<Renderer>().material.color;
+                Color c = w.obj.GetComponent<ObjectController>().rend.material.color;
                 c.a = 1f;
-                w.obj.GetComponent<Renderer>().material.color = c;
+                w.obj.GetComponent<ObjectController>().rend.material.color = c;
                 Walls.Remove(w);
             }
         }
@@ -70,9 +70,9 @@ public class ActorManager : MonoBehaviour
                         w.ishit = true;
                         Walls[i] = w;
                     }
-                    Color c = hit.transform.GetComponent<Renderer>().material.color;
-                    c.a = 0.5f;
-                    hit.transform.GetComponent<Renderer>().material.color = c;
+                        Color c = hit.transform.GetComponent<ObjectController>().rend.material.color;
+                    c.a = 0.25f;
+                    hit.transform.GetComponent<ObjectController>().rend.material.color = c;
                     Wall n = new Wall(hit.transform, true);
                     Walls.Add(n);
                 }

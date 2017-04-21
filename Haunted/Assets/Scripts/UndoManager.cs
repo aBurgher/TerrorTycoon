@@ -6,7 +6,6 @@ public class UndoManager : MonoBehaviour {
     public enum Act {Place, Edit, Delete };
     List<change> Undo;
     List<change> Redo;
-    List<GameObject> GraveYard;
     //Defines a change in the gameworld. 
     public struct change
     {
@@ -33,7 +32,7 @@ public class UndoManager : MonoBehaviour {
 	void Start () {
         Undo = new List<change>();
         Redo = new List<change>();
-        GraveYard = new List<GameObject>();
+      
         
 	}
 	
